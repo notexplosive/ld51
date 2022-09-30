@@ -31,7 +31,7 @@ public class LudumCartridge : MachinaCartridge
     {
         _scene = AddSceneAsLayer();
         var guy = _scene.AddActor("Guy");
-        new Box(guy, new Point(50));
+        new Box(guy, new Point(50), new Point(25, 25));
         new BoxRenderer(guy);
         new Hoverable(guy);
 
