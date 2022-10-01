@@ -1,5 +1,6 @@
 ﻿using System;
 using ExplogineMonoGame;
+using ExplogineMonoGame.Data;
 using ExTween;
 using ExTweenMonoGame;
 using MachinaLite;
@@ -9,15 +10,6 @@ namespace LD51;
 
 public static class Fx
 {
-    private static Scene _gameScene;
-    private static Scene _uiScene;
-
-    public static void Setup(Scene gameScene, Scene uiScene)
-    {
-        Fx._gameScene = gameScene;
-        Fx._uiScene = uiScene;
-    }
-
     public static void GainEnergy(Vector2 worldPosition, int amount)
     {
         for (var i = 0; i < amount; i++)
@@ -28,7 +20,7 @@ public static class Fx
 
     private static void GainEnergyParticle(Vector2 worldPosition)
     {
-        var particleParent = Fx._uiScene.AddActor("EnergyParticle");
+        var particleParent = LudumCartridge.Ui.Scene.AddActor("EnergyParticle");
         particleParent.Transform.Position = Fx.GameSpaceToUiSpace(worldPosition);
         particleParent.Transform.Depth -= 100;
         var destination = Vector2.Zero;
@@ -71,15 +63,50 @@ public static class Fx
 
     public static Vector2 UiSpaceToGameSpace(Vector2 uiPosition)
     {
-        return Fx._gameScene.Camera.ScreenToWorld(Fx._uiScene.Camera.WorldToScreen(uiPosition));
+        return LudumCartridge.World.Scene.Camera.ScreenToWorld(LudumCartridge.Ui.Scene.Camera.WorldToScreen(uiPosition));
     }
 
     public static Vector2 GameSpaceToUiSpace(Vector2 gamePosition)
     {
-        return Fx._uiScene.Camera.ScreenToWorld(Fx._gameScene.Camera.WorldToScreen(gamePosition));
+        return LudumCartridge.Ui.Scene.Camera.ScreenToWorld(LudumCartridge.World.Scene.Camera.WorldToScreen(gamePosition));
     }
 
-    public static void PutCardInDiscard(Vector2 toVector2, CropTemplate template)
+    public static void PutCardInDiscard(Vector2 worldPosition, CropTemplate template)
     {
+        var particle = LudumCartridge.Ui.Scene.AddActor("CardParticle");
+        particle.Transform.Position = Fx.GameSpaceToUiSpace(worldPosition);
+        particle.Transform.Depth -= 100;
+        var destination = LudumCartridge.Ui.DiscardPile.Rectangle.Center.ToVector2();
+
+        
+        var positionTweenable =
+            new TweenableVector2(() => particle.Transform.Position, v => particle.Transform.Position = v);
+
+        var travelVector = destination - particle.Transform.Position;
+        travelVector.Normalize();
+
+        var renderer = new DummyCardRenderer(particle, template);
+        
+        var scaleTweenable = new TweenableFloat(() => renderer.Scale, v => renderer.Scale = v);
+        scaleTweenable.Value = 0.25f;
+
+        var initialPhaseDuration = 0.15f;
+        var duration = 1f;
+        var tweenOwner = new TweenOwner(particle);
+        tweenOwner.Tween = new SequenceTween()
+                .Add(
+                    new MultiplexTween()
+                        .AddChannel(new Tween<Vector2>(positionTweenable, particle.Transform.Position - new Vector2(0, 150), initialPhaseDuration, Ease.SineFastSlow))
+                    )
+                .Add(new WaitSecondsTween(0.15f))
+                .Add(
+                    new MultiplexTween()
+                        .AddChannel(new Tween<Vector2>(positionTweenable, destination, duration, Ease.SineFastSlow))
+                        .AddChannel(new Tween<float>(scaleTweenable, 1f, duration / 2f, Ease.Linear))
+                )
+                .Add(new WaitSecondsTween(0.25f))
+                .Add(new CallbackTween(particle.Destroy))
+                .Add(new CallbackTween(() => LudumCartridge.Ui.DiscardPile.Add(template)))
+            ;
     }
 }

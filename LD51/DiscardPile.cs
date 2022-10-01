@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using MachinaLite;
+using MachinaLite.Components;
+using Microsoft.Xna.Framework;
 
 namespace LD51;
 
@@ -8,9 +10,13 @@ public class DiscardPile : BaseComponent
     private readonly TextInBox _text;
     private Stack<CropTemplate> _content = new();
     private readonly Deck _deck;
+    private readonly Box _box;
+
+    public Rectangle Rectangle => _box.Rectangle; 
 
     public DiscardPile(Actor actor, Deck deck) : base(actor)
     {
+        _box = RequireComponent<Box>();
         _text = RequireComponent<TextInBox>();
         _deck = deck;
     }

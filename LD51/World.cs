@@ -9,6 +9,7 @@ public class World
 {
     public World(Scene scene)
     {
+        Scene = scene;
         var gardenActor = scene.AddActor("Tiles");
         var tiles = new Tiles(gardenActor, new Point(25));
         new TileRenderer(gardenActor);
@@ -83,4 +84,6 @@ public class World
 
         guy.Transform.Position = new Vector2(500, 500);
     }
+
+    public Scene Scene { get; }
 }

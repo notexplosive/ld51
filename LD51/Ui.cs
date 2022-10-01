@@ -9,11 +9,13 @@ namespace LD51;
 
 public class Ui
 {
+    public Scene Scene { get; }
     public Inventory Inventory { get; }
     public DiscardPile DiscardPile { get; }
 
     public Ui(Scene scene)
     {
+        Scene = scene;
         var totalScreenSize = Client.Window.RenderResolution;
         var sheet = Client.Assets.GetAsset<NinepatchSheet>("UI-Patch");
 

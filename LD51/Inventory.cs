@@ -1,4 +1,8 @@
 ﻿using System.Collections.Generic;
+using ExplogineCore.Data;
+using ExplogineMonoGame;
+using ExplogineMonoGame.AssetManagement;
+using ExplogineMonoGame.Data;
 using MachinaLite;
 using MachinaLite.Components;
 using Microsoft.Xna.Framework;
@@ -20,9 +24,10 @@ public class Inventory : BaseComponent
         var cardActor = Transform.AddActorAsChild("Card");
         cardActor.Transform.LocalDepth -= 10;
         new Box(cardActor, A.CardSize);
-        new BoxRenderer(cardActor);
         new Hoverable(cardActor);
-        new TextInBox(cardActor, A.CardTextFont, template.Name);
+        new CardRenderer(cardActor, template);
+        // new BoxRenderer(cardActor);
+        // new TextInBox(cardActor, A.CardTextFont, template.Name);
         var card = new Card(cardActor, this, template);
 
         _cardsInHand.Add(card);
@@ -69,5 +74,35 @@ public class Inventory : BaseComponent
         _cardsInHand.Remove(card);
         discardPile.Add(card.CropTemplate);
         ArrangeCards();
+    }
+}
+
+public class CardRenderer : BaseComponent
+{
+    private readonly Box _box;
+    private readonly float _opacity;
+    private readonly CropTemplate _template;
+
+    public CardRenderer(Actor actor, CropTemplate template) : base(actor)
+    {
+        _box = RequireComponent<Box>();
+        _template = template;
+        _opacity = 1f;
+    }
+
+    public override void Draw(Painter painter)
+    {
+        CardRenderer.DrawCard(painter, _box.Rectangle, _template, _opacity, 1f, Transform.Depth);
+    }
+
+    public static void DrawCard(Painter painter, Rectangle rectangle, CropTemplate template, float opacity,
+        float textScale, Depth depth)
+    {
+        var ninePatchSheet = Client.Assets.GetAsset<NinepatchSheet>("Card-Patch");
+        ninePatchSheet.DrawFullNinepatch(painter, rectangle, InnerOuter.Inner, depth, opacity);
+
+        painter.DrawStringWithinRectangle(A.CardTextFont.WithFontSize((int) (A.CardTextFont.FontSize * textScale)),
+            template.Name, rectangle, Alignment.Center,
+            new DrawSettings {Depth = depth - 1, Color = Color.Black.WithMultipliedOpacity(opacity)});
     }
 }

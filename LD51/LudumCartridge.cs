@@ -53,6 +53,12 @@ public class LudumCartridge : MachinaCartridge
             var texture = Client.Assets.GetTexture("ui-bg");
             return new NinepatchSheet(texture, texture.Bounds, new Rectangle(new Point(3), new Point(58)));
         });
+        
+        yield return new LoadEvent("Card-Patch", () =>
+        {
+            var texture = Client.Assets.GetTexture("card");
+            return new NinepatchSheet(texture, texture.Bounds, new Rectangle(new Point(7), new Point(50)));
+        });
     }
 
     public override void OnCartridgeStarted()
@@ -62,8 +68,6 @@ public class LudumCartridge : MachinaCartridge
 
         LudumCartridge.GameScene = AddSceneAsLayer();
         LudumCartridge.UiScene = AddSceneAsLayer();
-
-        Fx.Setup(LudumCartridge.GameScene, LudumCartridge.UiScene);
 
         LudumCartridge.World = new World(GameScene);
         LudumCartridge.Ui = new Ui(UiScene);
