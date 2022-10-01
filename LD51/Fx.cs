@@ -1,9 +1,7 @@
 ﻿using System;
 using ExplogineMonoGame;
-using ExplogineMonoGame.Data;
 using ExTween;
 using ExTweenMonoGame;
-using MachinaLite;
 using Microsoft.Xna.Framework;
 
 namespace LD51;
@@ -12,10 +10,20 @@ public static class Fx
 {
     public static void GainEnergy(Vector2 worldPosition, int amount)
     {
+        Fx.GainEnergyToast(worldPosition, amount);
         for (var i = 0; i < amount; i++)
         {
             Fx.GainEnergyParticle(worldPosition);
         }
+    }
+
+    private static void GainEnergyToast(Vector2 worldPosition, int amount)
+    {
+        var particle = LudumCartridge.Ui.Scene.AddActor("EnergyParticle");
+        particle.Transform.Position = Fx.GameSpaceToUiSpace(worldPosition);
+        particle.Transform.Depth -= 100;
+
+        new TextToast(particle, amount);
     }
 
     private static void GainEnergyParticle(Vector2 worldPosition)
@@ -63,12 +71,14 @@ public static class Fx
 
     public static Vector2 UiSpaceToGameSpace(Vector2 uiPosition)
     {
-        return LudumCartridge.World.Scene.Camera.ScreenToWorld(LudumCartridge.Ui.Scene.Camera.WorldToScreen(uiPosition));
+        return LudumCartridge.World.Scene.Camera.ScreenToWorld(
+            LudumCartridge.Ui.Scene.Camera.WorldToScreen(uiPosition));
     }
 
     public static Vector2 GameSpaceToUiSpace(Vector2 gamePosition)
     {
-        return LudumCartridge.Ui.Scene.Camera.ScreenToWorld(LudumCartridge.World.Scene.Camera.WorldToScreen(gamePosition));
+        return LudumCartridge.Ui.Scene.Camera.ScreenToWorld(
+            LudumCartridge.World.Scene.Camera.WorldToScreen(gamePosition));
     }
 
     public static void PutCardInDiscard(Vector2 worldPosition, CropTemplate template)
@@ -78,7 +88,6 @@ public static class Fx
         particle.Transform.Depth -= 100;
         var destination = LudumCartridge.Ui.DiscardPile.Rectangle.Center.ToVector2();
 
-        
         var positionTweenable =
             new TweenableVector2(() => particle.Transform.Position, v => particle.Transform.Position = v);
 
@@ -86,7 +95,7 @@ public static class Fx
         travelVector.Normalize();
 
         var renderer = new DummyCardRenderer(particle, template);
-        
+
         var scaleTweenable = new TweenableFloat(() => renderer.Scale, v => renderer.Scale = v);
         scaleTweenable.Value = 0.25f;
 
@@ -96,8 +105,9 @@ public static class Fx
         tweenOwner.Tween = new SequenceTween()
                 .Add(
                     new MultiplexTween()
-                        .AddChannel(new Tween<Vector2>(positionTweenable, particle.Transform.Position - new Vector2(0, 150), initialPhaseDuration, Ease.SineFastSlow))
-                    )
+                        .AddChannel(new Tween<Vector2>(positionTweenable,
+                            particle.Transform.Position - new Vector2(0, 150), initialPhaseDuration, Ease.SineFastSlow))
+                )
                 .Add(new WaitSecondsTween(0.15f))
                 .Add(
                     new MultiplexTween()
