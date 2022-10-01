@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace LD51;
 
-internal class Card : BaseComponent
+public class Card : BaseComponent
 {
     private readonly Hoverable _hoverable;
     private readonly SeedInventory _inventory;

@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace LD51;
 
-internal class SeedInventory : BaseComponent
+public class SeedInventory : BaseComponent
 {
     private readonly List<Card> _cardsInHand = new();
 

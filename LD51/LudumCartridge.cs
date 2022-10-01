@@ -26,13 +26,19 @@ public class LudumCartridge : MachinaCartridge
                 var texture = Client.Assets.GetTexture("tiles");
                 return new GridBasedSpriteSheet(texture, new Point(64));
             });
-        
-        
+
         yield return
             new LoadEvent("Plants", () =>
             {
                 var texture = Client.Assets.GetTexture("plant");
                 return new GridBasedSpriteSheet(texture, new Point(128));
+            });
+        
+        yield return
+            new LoadEvent("Tools", () =>
+            {
+                var texture = Client.Assets.GetTexture("tools");
+                return new GridBasedSpriteSheet(texture, new Point(64));
             });
     }
 
@@ -63,11 +69,6 @@ public class LudumCartridge : MachinaCartridge
     private void BuildGameScene()
     {
         var gameScene = AddSceneAsLayer();
-        var guy = gameScene.AddActor("Guy");
-        var box = new Box(guy, new Point(25, 50));
-        box.Offset = new Point(box.Size.X / 2, box.Size.Y);
-        new BoxRenderer(guy);
-        var farmer = new Farmer(guy);
 
         var gardenActor = gameScene.AddActor("Tiles");
         var tiles = new Tiles(gardenActor, new Point(25));
@@ -77,29 +78,53 @@ public class LudumCartridge : MachinaCartridge
         new GardenRenderer(gardenActor);
         gardenActor.Transform.Depth += 500;
 
+        var guy = gameScene.AddActor("Guy");
+        var box = new Box(guy, new Point(25, 50));
+        box.Offset = new Point(box.Size.X / 2, box.Size.Y);
+        new BoxRenderer(guy);
+        var farmer = new Farmer(guy, tiles);
+
         tiles.TileTapped += position =>
         {
-            if (farmer.CurrentTile.HasValue && farmer.CurrentTile.Value == position)
+            if (farmer.InputBlocked)
             {
-                if (_inventory.HasGrabbedCard())
+                return;
+            }
+
+            var farmerIsStandingOnTappedTile = farmer.CurrentTile.HasValue && farmer.CurrentTile.Value == position;
+            
+            if (_inventory.HasGrabbedCard())
+            {
+                var canPlantHere = tiles.GetContentAt(position) == TileContent.Watered && garden.IsEmpty(position);
+                if (canPlantHere)
                 {
-                    if (tiles.GetContentAt(position) == TileContent.Watered && garden.IsEmpty(position))
+                    farmer.ClearTween();
+                    if (!farmerIsStandingOnTappedTile)
                     {
-                        garden.PlantSeed(_inventory.GrabbedSeed(), position);
-                        _inventory.DiscardGrabbedCard();
+                        farmer.EnqueueGoToTile(position);
+                        farmer.EnqueueStepOffTile();
                     }
-                    
-                    _inventory.ClearGrabbedCard();
+                    farmer.EnqueuePlantCrop(_inventory.GrabbedSeed(), garden, position);
+                    farmer.EnqueueDiscardGrabbedCard(_inventory);
                 }
                 else
                 {
-                    tiles.PutTileContentAt(position, tiles.GetContentAt(position).Upgrade());
+                    _inventory.ClearGrabbedCard();
                 }
+
             }
             else
             {
-                _inventory.ClearGrabbedCard();
-                farmer.GoToTile(position);
+                if (farmerIsStandingOnTappedTile)
+                {
+                    farmer.ClearTween();
+                    farmer.EnqueueUpgradeCurrentTile();
+                }else
+                {
+                    _inventory.ClearGrabbedCard();
+                    farmer.ClearTween();
+                    farmer.EnqueueGoToTile(position);
+                }
             }
         };
 

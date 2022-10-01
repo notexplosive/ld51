@@ -4,7 +4,7 @@ using MachinaLite;
 
 namespace LD51;
 
-internal class Garden : BaseComponent
+public class Garden : BaseComponent
 {
     private readonly Dictionary<TilePosition, Crop> _map = new();
 
@@ -12,7 +12,7 @@ internal class Garden : BaseComponent
     {
     }
 
-    public void PlantSeed(Crop crop, TilePosition position)
+    public void PlantCrop(Crop crop, TilePosition position)
     {
         _map[position] = crop;
     }
