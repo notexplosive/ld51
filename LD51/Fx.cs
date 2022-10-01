@@ -78,4 +78,8 @@ public static class Fx
     {
         return Fx._uiScene.Camera.ScreenToWorld(Fx._gameScene.Camera.WorldToScreen(gamePosition));
     }
+
+    public static void PutCardInDiscard(Vector2 toVector2, CropTemplate template)
+    {
+    }
 }

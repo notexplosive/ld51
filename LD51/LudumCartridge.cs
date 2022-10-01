@@ -92,7 +92,7 @@ public class LudumCartridge : MachinaCartridge
         Inventory = new SeedInventory(inventoryActor);
         Inventory.AddCard(CropTemplate.Potato);
         Inventory.AddCard(CropTemplate.Potato);
-        Inventory.AddCard(CropTemplate.Potato);
+        Inventory.AddCard(CropTemplate.Carrot);
 
         var rightPadding = 32;
 
