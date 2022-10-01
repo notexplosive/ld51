@@ -15,14 +15,15 @@ public class SeedInventory : BaseComponent
 
     public Card GrabbedCard { get; private set; }
 
-    public void AddCard()
+    public void AddCard(CropTemplate template)
     {
         var cardActor = Transform.AddActorAsChild("Card");
         cardActor.Transform.LocalDepth -= 10;
         new Box(cardActor, A.CardSize);
         new BoxRenderer(cardActor);
         new Hoverable(cardActor);
-        var card = new Card(cardActor, this, CropTemplate.Potato);
+        new TextInBox(cardActor, A.CardTextFont, template.Name);
+        var card = new Card(cardActor, this, template);
 
         _cardsInHand.Add(card);
 

@@ -7,5 +7,15 @@ public static class PlayerStats
     public class Stat
     {
         public int Amount { get; set; }
+
+        public bool CanAfford(int cost)
+        {
+            return Amount >= cost;
+        }
+
+        public void Consume(int cost)
+        {
+            Amount -= cost;
+        }
     }
 }

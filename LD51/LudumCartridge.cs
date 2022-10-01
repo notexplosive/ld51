@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ExplogineCore;
 using ExplogineMonoGame;
 using ExplogineMonoGame.AssetManagement;
@@ -18,7 +19,7 @@ public class LudumCartridge : MachinaCartridge
     public SeedInventory Inventory { get; private set; }
 
     public override CartridgeConfig CartridgeConfig { get; } = new(new Point(1600, 900));
-    
+
     public override void AddCommandLineParameters(CommandLineParametersWriter parameters)
     {
     }
@@ -86,16 +87,37 @@ public class LudumCartridge : MachinaCartridge
         var inventoryActor = LudumCartridge.UiScene.AddActor("Inventory");
         inventoryActor.Transform.Position = new Vector2(0, totalScreenSize.Y - A.CardSize.Y * 2f / 3);
 
+        Inventory = new SeedInventory(inventoryActor);
+        Inventory.AddCard(CropTemplate.Potato);
+        Inventory.AddCard(CropTemplate.Potato);
+        Inventory.AddCard(CropTemplate.Potato);
+
+        var deckActor = inventoryActor.Transform.AddActorAsChild("Deck");
+        deckActor.Transform.LocalPosition += new Vector2(totalScreenSize.X - A.CardSize.X - 32, 0);
+        deckActor.Transform.LocalDepth -= 10;
+        new Box(deckActor, A.CardSize);
+        var deck = new Deck(deckActor);
+        new Hoverable(deckActor);
+        new BoxRenderer(deckActor);
+        new TextInBox(deckActor, A.CardTextFont, $"Draw Card\n({A.DrawCardCost} Energy)");
+        var click = new Clickable(deckActor);
+        click.Clicked += (button) =>
+        {
+            if (button == MouseButton.Left)
+            {
+                if (deck.IsNotEmpty() && PlayerStats.Energy.CanAfford(A.DrawCardCost))
+                {
+                    PlayerStats.Energy.Consume(A.DrawCardCost);
+                    Inventory.AddCard(deck.DrawCard());
+                }
+            }
+        };
+
         var inventoryBackground = inventoryActor.Transform.AddActorAsChild("Background");
         inventoryBackground.Transform.LocalPosition += new Vector2(0, 32);
         new Box(inventoryBackground, new Point(totalScreenSize.X, A.CardSize.Y));
         new NinepatchRenderer(inventoryBackground, sheet);
         new Hoverable(inventoryBackground);
-
-        Inventory = new SeedInventory(inventoryActor);
-        Inventory.AddCard();
-        Inventory.AddCard();
-        Inventory.AddCard();
     }
 
     private void BuildGameScene()
