@@ -59,24 +59,35 @@ public class Farmer : BaseComponent
         _tween.Clear();
     }
 
-    public void EnqueueWalkTo(Vector2 target)
+    public ITween WalkTo(Vector2 target)
     {
         var distance = (_tweenablePosition.Value - target).Length();
         var duration = distance / _speed;
 
         if (distance == 0)
         {
-            return;
+            return new SequenceTween();
         }
 
-        _tween.Add(new Tween<Vector2>(_tweenablePosition, target, duration, Ease.Linear));
+        return new Tween<Vector2>(_tweenablePosition, target, duration, Ease.Linear);
     }
 
-    public void EnqueueGoToTile(TilePosition tilePosition)
+    public void EnqueueGoToTile(TilePosition tilePosition, bool blockInput = false)
     {
         CurrentTile = null;
-        EnqueueWalkTo(tilePosition.Rectangle.Center.ToVector2());
-        _tween.Add(new CallbackTween(() => { CurrentTile = tilePosition; }));
+
+        if (blockInput)
+        {
+            Enqueue(HaltInput());
+        }
+        
+        Enqueue(WalkTo(tilePosition.Rectangle.Center.ToVector2()));
+        Enqueue(new CallbackTween(() => { CurrentTile = tilePosition; }));
+        
+        if (blockInput)
+        {
+            Enqueue(RestoreInput());
+        }
     }
 
     public void UpgradeCurrentTile()
@@ -87,57 +98,89 @@ public class Farmer : BaseComponent
         }
     }
 
-    public void EnqueueStepOffTile()
+    private ITween StepOffTile()
     {
-        EnqueueHaltInput();
-        EnqueueWalkTo(CurrentTile.Value.Rectangle.Center.ToVector2() - new Vector2(A.TileRect.Width / 2f, 0));
-        _tween.Add(new WaitSecondsTween(0.15f));
-        EnqueueRestoreInput();
+        var result = new SequenceTween();
+        result.Add(HaltInput());
+        result.Add(
+            new DynamicTween(() =>
+            {
+                if (CurrentTile.HasValue)
+                {
+                    return WalkTo(
+                        CurrentTile.Value.Rectangle.Center.ToVector2() - new Vector2(A.TileRect.Width / 2f, 0));
+                }
+
+                return new SequenceTween();
+            })
+        );
+        result.Add(new WaitSecondsTween(0.15f));
+        result.Add(RestoreInput());
+        return result;
     }
 
-    private void EnqueueRestoreInput()
+    private void Enqueue(ITween tween)
     {
-        _tween.Add(new CallbackTween(() => _blockingFlags--));
+        _tween.Add(tween);
     }
 
-    private void EnqueueHaltInput()
+    private ITween RestoreInput()
     {
-        _tween.Add(new CallbackTween(() => _blockingFlags++));
+        return new CallbackTween(() => _blockingFlags--);
+    }
+
+    private ITween HaltInput()
+    {
+        return new CallbackTween(() => _blockingFlags++);
     }
 
     public void EnqueueUpgradeCurrentTile()
     {
-        EnqueueHaltInput();
-        EnqueueStepOffTile();
-        if (CurrentTile.HasValue)
+        Enqueue(UpgradeCurrentTileTween());
+    }
+
+    private ITween UpgradeCurrentTileTween()
+    {
+        var result = new SequenceTween();
+        result.Add(HaltInput());
+        result.Add(StepOffTile());
+        result.Add(new DynamicTween(() =>
         {
-            var tileContent = _tiles.GetContentAt(CurrentTile.Value);
-            if (tileContent == TileContent.Normal)
+            var dynamicResult = new SequenceTween();
+
+            if (CurrentTile.HasValue)
             {
-                _toolAngle.Value = 0f;
-                _tween.Add(ShowTool(Tool.Hoe));
-                _tween.Add(new Tween<float>(_toolAngle, -MathF.PI / 2f, 0.5f, Ease.QuadFastSlow));
-                _tween.Add(new Tween<float>(_toolAngle, MathF.PI / 4f, 0.25f, Ease.QuadSlowFast));
-                _tween.Add(new CallbackTween(UpgradeCurrentTile));
-                _tween.Add(new WaitSecondsTween(0.1f));
+                var tileContent = _tiles.GetContentAt(CurrentTile.Value);
+                if (tileContent == TileContent.Normal)
+                {
+                    dynamicResult.Add(new CallbackTween(() => _toolAngle.Value = 0f));
+                    dynamicResult.Add(ShowTool(Tool.Hoe));
+                    dynamicResult.Add(new Tween<float>(_toolAngle, -MathF.PI / 2f, 0.5f, Ease.QuadFastSlow));
+                    dynamicResult.Add(new Tween<float>(_toolAngle, MathF.PI / 4f, 0.25f, Ease.QuadSlowFast));
+                    dynamicResult.Add(new CallbackTween(UpgradeCurrentTile));
+                    dynamicResult.Add(new WaitSecondsTween(0.1f));
+                }
+
+                if (tileContent == TileContent.Tilled)
+                {
+                    dynamicResult.Add(ShowTool(Tool.WateringCan));
+                    dynamicResult.Add(new CallbackTween(() => _toolAngle.Value = 0f));
+                    dynamicResult.Add(new Tween<float>(_toolAngle, MathF.PI / 4f, 0.25f, Ease.QuadFastSlow));
+                    dynamicResult.Add(new WaitSecondsTween(0.1f));
+                    dynamicResult.Add(new CallbackTween(UpgradeCurrentTile));
+                    dynamicResult.Add(new WaitSecondsTween(0.1f));
+                    dynamicResult.Add(new Tween<float>(_toolAngle, 0, 0.25f, Ease.QuadSlowFast));
+                    dynamicResult.Add(new WaitSecondsTween(0.15f));
+                }
             }
 
-            if (tileContent == TileContent.Tilled)
-            {
-                _tween.Add(ShowTool(Tool.WateringCan));
-                _toolAngle.Value = 0f;
-                _tween.Add(new Tween<float>(_toolAngle, MathF.PI / 4f, 0.25f, Ease.QuadFastSlow));
-                _tween.Add(new WaitSecondsTween(0.1f));
-                _tween.Add(new CallbackTween(UpgradeCurrentTile));
-                _tween.Add(new WaitSecondsTween(0.1f));
-                _tween.Add(new Tween<float>(_toolAngle, 0, 0.25f, Ease.QuadSlowFast));
-                _tween.Add(new WaitSecondsTween(0.15f));
-            }
+            return dynamicResult;
+        }));
 
-            _tween.Add(HideTool());
+        result.Add(HideTool());
+        result.Add(RestoreInput());
 
-            EnqueueRestoreInput();
-        }
+        return result;
     }
 
     private ITween HideTool()
@@ -152,13 +195,21 @@ public class Farmer : BaseComponent
 
     public void EnqueuePlantCrop(Crop crop, Garden garden, TilePosition position)
     {
-        EnqueueStepOffTile();
-        _tween.Add(new CallbackTween(() => garden.PlantCrop(crop, position)));
+        Enqueue(StepOffTile());
+        Enqueue(new CallbackTween(() => garden.PlantCrop(crop, position)));
     }
 
-    public void EnqueueDiscardGrabbedCard(SeedInventory inventory)
+    public void EnqueueDiscardGrabbedCard(SeedInventory inventory, Card card)
     {
-        inventory.DiscardGrabbedCard();
-        inventory.ClearGrabbedCard();
+        Enqueue(new CallbackTween(() =>
+        {
+            inventory.Discard(card);
+            inventory.ClearGrabbedCard();
+        }));
+    }
+
+    public void EnqueueStepOffTile()
+    {
+        Enqueue(StepOffTile());
     }
 }

@@ -98,14 +98,18 @@ public class LudumCartridge : MachinaCartridge
                 var canPlantHere = tiles.GetContentAt(position) == TileContent.Watered && garden.IsEmpty(position);
                 if (canPlantHere)
                 {
+                    var crop = _inventory.GrabbedCard.Crop;
+                    _inventory.Discard(_inventory.GrabbedCard);
+                    _inventory.ClearGrabbedCard();
+                    
                     farmer.ClearTween();
                     if (!farmerIsStandingOnTappedTile)
                     {
-                        farmer.EnqueueGoToTile(position);
+                        farmer.EnqueueGoToTile(position, true);
                         farmer.EnqueueStepOffTile();
                     }
-                    farmer.EnqueuePlantCrop(_inventory.GrabbedSeed(), garden, position);
-                    farmer.EnqueueDiscardGrabbedCard(_inventory);
+                    farmer.EnqueuePlantCrop(crop, garden, position);
+
                 }
                 else
                 {

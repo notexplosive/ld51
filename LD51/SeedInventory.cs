@@ -13,7 +13,7 @@ public class SeedInventory : BaseComponent
     {
     }
 
-    private Card _grabbedCard;
+    public Card GrabbedCard { get; private set; }
 
     public void AddCard()
     {
@@ -42,33 +42,28 @@ public class SeedInventory : BaseComponent
 
     public void ClearGrabbedCard()
     {
-        _grabbedCard = null;
+        GrabbedCard = null;
     }
 
     public bool IsGrabbed(Card card)
     {
-        return _grabbedCard != card;
+        return GrabbedCard != card;
     }
 
     public void Grab(Card card)
     {
-        _grabbedCard = card;
+        GrabbedCard = card;
     }
 
     public bool HasGrabbedCard()
     {
-        return _grabbedCard != null;
+        return GrabbedCard != null;
     }
 
-    public Crop GrabbedSeed()
+    public void Discard(Card card)
     {
-        return _grabbedCard.Crop;
-    }
-
-    public void DiscardGrabbedCard()
-    {
-        _grabbedCard.Actor.Destroy();
-        _cardsInHand.Remove(_grabbedCard);
+        card.Actor.Destroy();
+        _cardsInHand.Remove(card);
         ArrangeCards();
     }
 }
