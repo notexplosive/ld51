@@ -33,7 +33,7 @@ public class LudumCartridge : MachinaCartridge
                 var texture = Client.Assets.GetTexture("plant");
                 return new GridBasedSpriteSheet(texture, new Point(128));
             });
-        
+
         yield return
             new LoadEvent("Tools", () =>
             {
@@ -92,7 +92,7 @@ public class LudumCartridge : MachinaCartridge
             }
 
             var farmerIsStandingOnTappedTile = farmer.CurrentTile.HasValue && farmer.CurrentTile.Value == position;
-            
+
             if (_inventory.HasGrabbedCard())
             {
                 var canPlantHere = tiles.GetContentAt(position) == TileContent.Watered && garden.IsEmpty(position);
@@ -101,21 +101,20 @@ public class LudumCartridge : MachinaCartridge
                     var crop = _inventory.GrabbedCard.Crop;
                     _inventory.Discard(_inventory.GrabbedCard);
                     _inventory.ClearGrabbedCard();
-                    
+
                     farmer.ClearTween();
                     if (!farmerIsStandingOnTappedTile)
                     {
                         farmer.EnqueueGoToTile(position, true);
                         farmer.EnqueueStepOffTile();
                     }
-                    farmer.EnqueuePlantCrop(crop, garden, position);
 
+                    farmer.EnqueuePlantCrop(crop, garden, position);
                 }
                 else
                 {
                     _inventory.ClearGrabbedCard();
                 }
-
             }
             else
             {
@@ -123,7 +122,8 @@ public class LudumCartridge : MachinaCartridge
                 {
                     farmer.ClearTween();
                     farmer.EnqueueUpgradeCurrentTile();
-                }else
+                }
+                else
                 {
                     _inventory.ClearGrabbedCard();
                     farmer.ClearTween();

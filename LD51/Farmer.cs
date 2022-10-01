@@ -193,7 +193,7 @@ public class Farmer : BaseComponent
         return new CallbackTween(() => _currentShownTool = tool);
     }
 
-    public void EnqueuePlantCrop(Crop crop, Garden garden, TilePosition position)
+    public void EnqueuePlantCrop(CropTemplate crop, Garden garden, TilePosition position)
     {
         Enqueue(StepOffTile());
         Enqueue(new CallbackTween(() => garden.PlantCrop(crop, position)));

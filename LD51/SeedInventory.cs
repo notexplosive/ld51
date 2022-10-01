@@ -21,7 +21,7 @@ public class SeedInventory : BaseComponent
         new Box(cardActor, A.CardSize);
         new BoxRenderer(cardActor);
         new Hoverable(cardActor);
-        var card = new Card(cardActor, this, new Crop());
+        var card = new Card(cardActor, this, CropTemplate.Potato);
 
         _cardsInHand.Add(card);
 

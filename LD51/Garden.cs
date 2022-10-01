@@ -12,9 +12,9 @@ public class Garden : BaseComponent
     {
     }
 
-    public void PlantCrop(Crop crop, TilePosition position)
+    public void PlantCrop(CropTemplate template, TilePosition position)
     {
-        _map[position] = crop;
+        _map[position] = template.CreateCrop();
     }
 
     public bool IsEmpty(TilePosition tilePosition)
