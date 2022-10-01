@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ExplogineCore;
 using ExplogineMonoGame;
 using ExplogineMonoGame.AssetManagement;
@@ -116,6 +117,11 @@ public class LudumCartridge : MachinaCartridge
             }
         };
 
+        var deckSize = deckActor.Transform.AddActorAsChild("DeckSizeActor");
+        new Box(deckSize, new Point(A.CardSize.X, 70));
+        var deckSizeText = new TextInBox(deckSize, A.BigFont, "0");
+        new Updater(deckSize, _ => { deckSizeText.Text = deck.NumberOfCards.ToString(); });
+
         // Discard Pile
         var discardActor = inventoryActor.Transform.AddActorAsChild("Deck");
         var discardHeaderSize = 32;
@@ -125,10 +131,12 @@ public class LudumCartridge : MachinaCartridge
         new Box(discardActor, A.CardSize + new Point(0, discardHeaderSize));
         new Hoverable(discardActor);
         new BoxRenderer(discardActor);
+        new TextInBox(discardActor, A.BigFont, "0");
         var discardHeader = discardActor.Transform.AddActorAsChild("DiscardHeader");
         new Box(discardHeader, new Point(A.CardSize.X, discardHeaderSize));
-        var headerText = new TextInBox(discardHeader, A.UiHintFont, "Discard Pile");
-        _discardPile = new DiscardPile(discardActor, deck, headerText);
+        new TextInBox(discardHeader, A.UiHintFont, "Discard Pile");
+
+        _discardPile = new DiscardPile(discardActor, deck);
 
         // Reshuffle Button
         var reshuffleButtonActor = inventoryActor.Transform.AddActorAsChild("Deck");
@@ -237,21 +245,36 @@ public class LudumCartridge : MachinaCartridge
     }
 }
 
+public class Updater : BaseComponent
+{
+    private readonly Action<float> _onUpdate;
+
+    public Updater(Actor actor, Action<float> onUpdate) : base(actor)
+    {
+        _onUpdate = onUpdate;
+    }
+
+    public override void Update(float dt)
+    {
+        _onUpdate(dt);
+    }
+}
+
 public class DiscardPile : BaseComponent
 {
     private readonly TextInBox _text;
     private Stack<CropTemplate> _content = new();
     private readonly Deck _deck;
 
-    public DiscardPile(Actor actor, Deck deck, TextInBox text) : base(actor)
+    public DiscardPile(Actor actor, Deck deck) : base(actor)
     {
-        _text = text;
+        _text = RequireComponent<TextInBox>();
         _deck = deck;
     }
 
     public override void Update(float dt)
     {
-        
+        _text.Text = _content.Count.ToString();
     }
 
     public void Reshuffle(Deck deck)

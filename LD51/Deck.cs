@@ -18,6 +18,8 @@ public class Deck : BaseComponent
         AddCard(CropTemplate.Potato);
     }
 
+    public int NumberOfCards => _content.Count;
+
     public void AddCard(CropTemplate template)
     {
         _content.Push(template);
