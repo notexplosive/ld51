@@ -16,7 +16,7 @@ public class Farmer : BaseComponent
         _tweenablePosition = new TweenableVector2(()=>Transform.Position, val => Transform.Position = val);
     }
 
-    public Tile? CurrentTile { get; set; }
+    public TilePosition? CurrentTile { get; set; }
 
     public override void Update(float dt)
     {
@@ -41,11 +41,11 @@ public class Farmer : BaseComponent
         _tween.Add(new Tween<Vector2>(_tweenablePosition, target, duration, Ease.Linear));
     }
 
-    public void GoToTile(Tile tile)
+    public void GoToTile(TilePosition tilePosition)
     {
         CurrentTile = null;
         ClearTween();
-        WalkTo(tile.Rectangle.Center.ToVector2());
-        CurrentTile = tile;
+        WalkTo(tilePosition.Rectangle.Center.ToVector2());
+        CurrentTile = tilePosition;
     }
 }

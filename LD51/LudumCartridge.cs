@@ -43,18 +43,19 @@ public class LudumCartridge : MachinaCartridge
         var tileActor = _scene.AddActor("Tiles");
         var tiles = new Tiles(tileActor, new Point(25));
         new TileRenderer(tileActor);
+        new SelectedTileRenderer(tileActor);
         tileActor.Transform.Depth += 500;
 
 
-        tiles.TileTapped += tile =>
+        tiles.TileTapped += position =>
         {
-            if (farmer.CurrentTile.HasValue && farmer.CurrentTile.Value == tile)
+            if (farmer.CurrentTile.HasValue && farmer.CurrentTile.Value == position)
             {
-                Client.Debug.Log($"Cultivate at {tile}");
+                tiles.PutTileContentAt(position, tiles.GetContentAt(position).Upgrade());
             }
             else
             {
-                farmer.GoToTile(tile);
+                farmer.GoToTile(position);
             }
         };
         

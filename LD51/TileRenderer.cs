@@ -17,12 +17,11 @@ public class TileRenderer : BaseComponent
 
     public override void Draw(Painter painter)
     {
-        for (var y = 0; y < _tiles.Dimensions.Y; y++)
+        foreach(var position in _tiles.AllTilesPositions())
         {
-            for (var x = 0; x < _tiles.Dimensions.X; x++)
             {
-                A.TileSheet.DrawFrame(painter, 0,
-                    new Vector2(x * A.TileRect.Width, y * A.TileRect.Height),
+                A.TileSheet.DrawFrame(painter, _tiles.GetContentAt(position).Frame,
+                    position.Rectangle.Location.ToVector2(),
                     Scale2D.One,
                     new DrawSettings {Color = Color.White, Depth = Transform.Depth});
             }
