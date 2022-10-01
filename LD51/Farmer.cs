@@ -7,13 +7,13 @@ namespace LD51;
 
 public class Farmer : BaseComponent
 {
-    private SequenceTween _tween = new();
     private readonly TweenableVector2 _tweenablePosition;
-    private float _speed = 400f;
+    private readonly float _speed = 400f;
+    private readonly SequenceTween _tween = new();
 
     public Farmer(Actor actor) : base(actor)
     {
-        _tweenablePosition = new TweenableVector2(()=>Transform.Position, val => Transform.Position = val);
+        _tweenablePosition = new TweenableVector2(() => Transform.Position, val => Transform.Position = val);
     }
 
     public TilePosition? CurrentTile { get; set; }
@@ -27,7 +27,7 @@ public class Farmer : BaseComponent
     {
         _tween.Clear();
     }
-    
+
     public void WalkTo(Vector2 target)
     {
         var distance = (_tweenablePosition.Value - target).Length();
@@ -37,7 +37,7 @@ public class Farmer : BaseComponent
         {
             return;
         }
-        
+
         _tween.Add(new Tween<Vector2>(_tweenablePosition, target, duration, Ease.Linear));
     }
 
@@ -46,6 +46,6 @@ public class Farmer : BaseComponent
         CurrentTile = null;
         ClearTween();
         WalkTo(tilePosition.Rectangle.Center.ToVector2());
-        CurrentTile = tilePosition;
+        _tween.Add(new CallbackTween(() => { CurrentTile = tilePosition; }));
     }
 }
