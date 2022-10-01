@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using ExplogineMonoGame;
 using MachinaLite;
 
 namespace LD51;
@@ -10,11 +11,16 @@ public class Deck : BaseComponent
     
     public Deck(Actor actor) : base(actor)
     {
-        _content.Push(CropTemplate.Potato);
-        _content.Push(CropTemplate.Potato);
-        _content.Push(CropTemplate.Potato);
-        _content.Push(CropTemplate.Potato);
-        _content.Push(CropTemplate.Potato);
+        AddCard(CropTemplate.Potato);
+        AddCard(CropTemplate.Potato);
+        AddCard(CropTemplate.Potato);
+        AddCard(CropTemplate.Potato);
+        AddCard(CropTemplate.Potato);
+    }
+
+    public void AddCard(CropTemplate template)
+    {
+        _content.Push(template);
     }
 
     public bool IsNotEmpty()
@@ -25,5 +31,21 @@ public class Deck : BaseComponent
     public CropTemplate DrawCard()
     {
         return _content.Pop();
+    }
+
+    public void Shuffle()
+    {
+        var buffer = new List<CropTemplate>();
+        while (_content.Count > 0)
+        {
+            buffer.Add(_content.Pop());
+        }
+        
+        Client.Random.Clean.Shuffle(buffer);
+
+        foreach (var item in buffer)
+        {
+            _content.Push(item);
+        }
     }
 }

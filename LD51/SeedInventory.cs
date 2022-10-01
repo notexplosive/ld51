@@ -63,10 +63,11 @@ public class SeedInventory : BaseComponent
         return GrabbedCard != null;
     }
 
-    public void Discard(Card card)
+    public void Discard(Card card, DiscardPile discardPile)
     {
         card.Actor.Destroy();
         _cardsInHand.Remove(card);
+        discardPile.Add(card.CropTemplate);
         ArrangeCards();
     }
 }

@@ -22,6 +22,6 @@ public class TextInBox : BaseComponent
     public override void Draw(Painter painter)
     {
         painter.DrawStringWithinRectangle(_font, _text, _box.Rectangle, Alignment.Center,
-            new DrawSettings {Color = Color.Black});
+            new DrawSettings {Color = Color.Black, Depth = Transform.Depth - 1});
     }
 }

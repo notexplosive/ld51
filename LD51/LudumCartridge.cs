@@ -14,6 +14,7 @@ namespace LD51;
 
 public class LudumCartridge : MachinaCartridge
 {
+    private DiscardPile _discardPile;
     public static Scene GameScene { get; private set; }
     public static Scene UiScene { get; private set; }
     public SeedInventory Inventory { get; private set; }
@@ -92,16 +93,18 @@ public class LudumCartridge : MachinaCartridge
         Inventory.AddCard(CropTemplate.Potato);
         Inventory.AddCard(CropTemplate.Potato);
 
+        var rightPadding = 32;
+
+        // Deck
         var deckActor = inventoryActor.Transform.AddActorAsChild("Deck");
-        deckActor.Transform.LocalPosition += new Vector2(totalScreenSize.X - A.CardSize.X - 32, 0);
+        deckActor.Transform.LocalPosition += new Vector2(totalScreenSize.X - A.CardSize.X - rightPadding, 0);
         deckActor.Transform.LocalDepth -= 10;
         new Box(deckActor, A.CardSize);
         var deck = new Deck(deckActor);
         new Hoverable(deckActor);
         new BoxRenderer(deckActor);
         new TextInBox(deckActor, A.CardTextFont, $"Draw Card\n({A.DrawCardCost} Energy)");
-        var click = new Clickable(deckActor);
-        click.Clicked += button =>
+        new Clickable(deckActor).Clicked += button =>
         {
             if (button == MouseButton.Left)
             {
@@ -110,6 +113,42 @@ public class LudumCartridge : MachinaCartridge
                     PlayerStats.Energy.Consume(A.DrawCardCost);
                     Inventory.AddCard(deck.DrawCard());
                 }
+            }
+        };
+
+        // Discard Pile
+        var discardActor = inventoryActor.Transform.AddActorAsChild("Deck");
+        var discardHeaderSize = 32;
+        discardActor.Transform.LocalPosition +=
+            new Vector2(totalScreenSize.X - A.CardSize.X * 2 - rightPadding * 2, -discardHeaderSize);
+        discardActor.Transform.LocalDepth -= 10;
+        new Box(discardActor, A.CardSize + new Point(0, discardHeaderSize));
+        new Hoverable(discardActor);
+        new BoxRenderer(discardActor);
+        var discardHeader = discardActor.Transform.AddActorAsChild("DiscardHeader");
+        new Box(discardHeader, new Point(A.CardSize.X, discardHeaderSize));
+        var headerText = new TextInBox(discardHeader, A.UiHintFont, "Discard Pile");
+        _discardPile = new DiscardPile(discardActor, deck, headerText);
+
+        // Reshuffle Button
+        var reshuffleButtonActor = inventoryActor.Transform.AddActorAsChild("Deck");
+        reshuffleButtonActor.Transform.LocalPosition +=
+            new Vector2(totalScreenSize.X - A.CardSize.X * 3 - rightPadding * 3, A.CardSize.Y / 4f);
+        reshuffleButtonActor.Transform.LocalDepth -= 10;
+        new Box(reshuffleButtonActor, new Point(A.CardSize.X, A.CardSize.Y / 4));
+        var renderer = new BoxRenderer(reshuffleButtonActor);
+        new TextInBox(reshuffleButtonActor, A.CardTextFont, "Reshuffle");
+        new Hoverable(reshuffleButtonActor);
+        new ChangeOnHovered(
+            reshuffleButtonActor,
+            () => { renderer.Color = Color.LightBlue; }, 
+            () => { renderer.Color = Color.White; }
+            );
+        new Clickable(reshuffleButtonActor).Clicked += button =>
+        {
+            if (button == MouseButton.Left)
+            {
+                _discardPile.Reshuffle(deck);
             }
         };
 
@@ -162,8 +201,8 @@ public class LudumCartridge : MachinaCartridge
                 var canPlantHere = tiles.GetContentAt(position).IsWet && garden.IsEmpty(position);
                 if (canPlantHere)
                 {
-                    var crop = Inventory.GrabbedCard.Crop;
-                    Inventory.Discard(Inventory.GrabbedCard);
+                    var crop = Inventory.GrabbedCard.CropTemplate;
+                    Inventory.Discard(Inventory.GrabbedCard, _discardPile);
                     Inventory.ClearGrabbedCard();
 
                     farmer.ClearTween();
@@ -195,6 +234,39 @@ public class LudumCartridge : MachinaCartridge
         };
 
         guy.Transform.Position = new Vector2(500, 500);
+    }
+}
+
+public class DiscardPile : BaseComponent
+{
+    private readonly TextInBox _text;
+    private Stack<CropTemplate> _content = new();
+    private readonly Deck _deck;
+
+    public DiscardPile(Actor actor, Deck deck, TextInBox text) : base(actor)
+    {
+        _text = text;
+        _deck = deck;
+    }
+
+    public override void Update(float dt)
+    {
+        
+    }
+
+    public void Reshuffle(Deck deck)
+    {
+        while (_content.Count > 0)
+        {
+            deck.AddCard(_content.Pop());
+        }
+
+        deck.Shuffle();
+    }
+
+    public void Add(CropTemplate template)
+    {
+        _content.Push(template);
     }
 }
 

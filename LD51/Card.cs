@@ -13,15 +13,15 @@ public class Card : BaseComponent
     private readonly Hoverable _hoverable;
     private readonly SeedInventory _inventory;
 
-    public Card(Actor actor, SeedInventory inventory, CropTemplate crop) : base(actor)
+    public Card(Actor actor, SeedInventory inventory, CropTemplate cropTemplate) : base(actor)
     {
         _hoverable = RequireComponent<Hoverable>();
         _inventory = inventory;
-        Crop = crop;
+        CropTemplate = cropTemplate;
     }
 
     public float HoverTimer { get; private set; }
-    public CropTemplate Crop { get; }
+    public CropTemplate CropTemplate { get; }
 
     public override void Update(float dt)
     {
