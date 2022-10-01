@@ -7,43 +7,42 @@ using Microsoft.Xna.Framework;
 
 namespace LD51;
 
-public record CropLevel(int MaxLevel, int FirstFrame);
-
-public record CropTemplate(int TickLength, CropLevel CropLevel)
-{
-    public static CropTemplate Potato = new(10, new CropLevel(3, 0));
-    public int EffectiveMaxLevel => CropLevel.MaxLevel - 1;
-
-    public Crop CreateCrop()
-    {
-        return new Crop(this);
-    }
-}
-
 public class Crop
 {
+    private readonly TilePosition _position;
+    private readonly Garden _garden;
     private readonly CropTemplate _template;
+    private readonly Tiles _tiles;
     private int _level;
     private float _timeAtCurrentLevel;
     private float _totalTime;
 
-    public Crop(CropTemplate template)
+    public Crop(Garden garden, CropTemplate template, Tiles tiles, TilePosition position)
     {
+        _garden = garden;
         _template = template;
+        _tiles = tiles;
+        _position = position;
     }
+
+    public bool IsReadyToHarvest => _level == _template.EffectiveMaxLevel;
 
     public void Draw(Painter painter, Vector2 renderPos, Depth depth)
     {
         Client.Assets.GetAsset<SpriteSheet>("Plants").DrawFrame(painter, _template.CropLevel.FirstFrame + _level,
             renderPos, Scale2D.One,
             new DrawSettings
-                {Color = Color.White, Depth = depth, Origin = DrawOrigin.Center, Angle = MathF.Sin(_totalTime) / 4f});
+                {Color = Color.White, Depth = depth, Origin = DrawOrigin.Center, Angle = MathF.Sin(_totalTime) / 8f});
     }
 
     public void Update(float dt)
     {
         _totalTime += dt;
-        _timeAtCurrentLevel += dt;
+
+        if (_tiles.GetContentAt(_position) == TileContent.Watered)
+        {
+            _timeAtCurrentLevel += dt;
+        }
 
         if (_timeAtCurrentLevel > _template.TickLength)
         {
@@ -57,10 +56,12 @@ public class Crop
 
         if (_level < _template.EffectiveMaxLevel)
         {
+            _tiles.PutTileContentAt(_position, TileContent.Tilled);
             _level++;
+
             Grew?.Invoke();
 
-            if (_level == _template.EffectiveMaxLevel)
+            if (IsReadyToHarvest)
             {
                 FinishedGrowing?.Invoke();
             }
@@ -69,4 +70,9 @@ public class Crop
 
     public event Action Grew;
     public event Action FinishedGrowing;
+
+    public void Harvest()
+    {
+        _garden.RemoveCropAt(_position);
+    }
 }

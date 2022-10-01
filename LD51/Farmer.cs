@@ -199,17 +199,17 @@ public class Farmer : BaseComponent
         Enqueue(new CallbackTween(() => garden.PlantCrop(crop, position)));
     }
 
-    public void EnqueueDiscardGrabbedCard(SeedInventory inventory, Card card)
-    {
-        Enqueue(new CallbackTween(() =>
-        {
-            inventory.Discard(card);
-            inventory.ClearGrabbedCard();
-        }));
-    }
-
     public void EnqueueStepOffTile()
     {
         Enqueue(StepOffTile());
+    }
+
+    public void EnqueueHarvestCrop(Crop crop)
+    {
+        Enqueue(HaltInput());
+        Enqueue(StepOffTile());
+        Enqueue(new WaitSecondsTween(0.25f));
+        Enqueue(new CallbackTween(()=>crop.Harvest()));
+        Enqueue(RestoreInput());
     }
 }
