@@ -5,11 +5,11 @@ using Microsoft.Xna.Framework;
 
 namespace LD51;
 
-public class SeedInventory : BaseComponent
+public class Inventory : BaseComponent
 {
     private readonly List<Card> _cardsInHand = new();
 
-    public SeedInventory(Actor actor) : base(actor)
+    public Inventory(Actor actor) : base(actor)
     {
     }
 

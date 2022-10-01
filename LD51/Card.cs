@@ -11,9 +11,9 @@ namespace LD51;
 public class Card : BaseComponent
 {
     private readonly Hoverable _hoverable;
-    private readonly SeedInventory _inventory;
+    private readonly Inventory _inventory;
 
-    public Card(Actor actor, SeedInventory inventory, CropTemplate cropTemplate) : base(actor)
+    public Card(Actor actor, Inventory inventory, CropTemplate cropTemplate) : base(actor)
     {
         _hoverable = RequireComponent<Hoverable>();
         _inventory = inventory;
