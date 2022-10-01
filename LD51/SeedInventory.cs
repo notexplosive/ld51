@@ -18,6 +18,7 @@ public class SeedInventory : BaseComponent
     public void AddCard()
     {
         var cardActor = Transform.AddActorAsChild("Card");
+        cardActor.Transform.LocalDepth -= 10;
         new Box(cardActor, A.CardSize);
         new BoxRenderer(cardActor);
         new Hoverable(cardActor);
@@ -32,10 +33,11 @@ public class SeedInventory : BaseComponent
     {
         var index = 0;
         var padding = 15;
+        var startingX = 32;
         foreach (var card in _cardsInHand)
         {
             card.Transform.LocalPosition =
-                new Vector2(A.CardSize.X * index + padding * index, card.Transform.LocalPosition.Y);
+                new Vector2(A.CardSize.X * index + padding * index + startingX, card.Transform.LocalPosition.Y);
             index++;
         }
     }
