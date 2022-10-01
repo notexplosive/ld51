@@ -3,19 +3,22 @@ using ExplogineCore;
 using ExplogineMonoGame;
 using ExplogineMonoGame.AssetManagement;
 using ExplogineMonoGame.Cartridges;
-using ExplogineMonoGame.Data;
+using ExplogineMonoGame.Input;
 using MachinaLite;
 using MachinaLite.Components;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace LD51;
 
 public class LudumCartridge : MachinaCartridge
 {
-    private SeedInventory _inventory;
-    public override CartridgeConfig CartridgeConfig { get; } = new(new Point(1600, 900));
+    public static Scene GameScene { get; private set; }
+    public static Scene UiScene { get; private set; }
+    public SeedInventory Inventory { get; private set; }
 
+    public override CartridgeConfig CartridgeConfig { get; } = new(new Point(1600, 900));
+    
     public override void AddCommandLineParameters(CommandLineParametersWriter parameters)
     {
     }
@@ -55,26 +58,32 @@ public class LudumCartridge : MachinaCartridge
         A.TileSheet = Client.Assets.GetAsset<SpriteSheet>("Tiles");
         A.TileRect = A.TileSheet.GetSourceRectForFrame(0);
 
+        LudumCartridge.GameScene = AddSceneAsLayer();
+        LudumCartridge.UiScene = AddSceneAsLayer();
+
+        Fx.Setup(LudumCartridge.GameScene, LudumCartridge.UiScene);
+
         BuildGameScene();
         BuildUiScene();
+
+        new DebugComponent(LudumCartridge.GameScene.AddActor("dbug"));
     }
 
     private void BuildUiScene()
     {
-        var uiScene = AddSceneAsLayer();
         var totalScreenSize = Client.Window.RenderResolution;
         var sheet = Client.Assets.GetAsset<NinepatchSheet>("UI-Patch");
 
-        var resourcesActor = uiScene.AddActor("Resources");
+        var resourcesActor = LudumCartridge.UiScene.AddActor("Resources");
         var resourcesBox = new Box(resourcesActor, new Point(totalScreenSize.X, 50));
         new NinepatchRenderer(resourcesActor, sheet);
         new Hoverable(resourcesActor);
 
         var energyText = resourcesActor.Transform.AddActorAsChild("EnergyText");
         new Box(energyText, new Point(200, resourcesBox.Rectangle.Height));
-        new ResourceText(energyText);
+        new ResourceText(energyText, "Energy", PlayerStats.Energy);
 
-        var inventoryActor = uiScene.AddActor("Inventory");
+        var inventoryActor = LudumCartridge.UiScene.AddActor("Inventory");
         inventoryActor.Transform.Position = new Vector2(0, totalScreenSize.Y - A.CardSize.Y * 2f / 3);
 
         var inventoryBackground = inventoryActor.Transform.AddActorAsChild("Background");
@@ -83,17 +92,15 @@ public class LudumCartridge : MachinaCartridge
         new NinepatchRenderer(inventoryBackground, sheet);
         new Hoverable(inventoryBackground);
 
-        _inventory = new SeedInventory(inventoryActor);
-        _inventory.AddCard();
-        _inventory.AddCard();
-        _inventory.AddCard();
+        Inventory = new SeedInventory(inventoryActor);
+        Inventory.AddCard();
+        Inventory.AddCard();
+        Inventory.AddCard();
     }
 
     private void BuildGameScene()
     {
-        var gameScene = AddSceneAsLayer();
-
-        var gardenActor = gameScene.AddActor("Tiles");
+        var gardenActor = LudumCartridge.GameScene.AddActor("Tiles");
         var tiles = new Tiles(gardenActor, new Point(25));
         new TileRenderer(gardenActor);
         new SelectedTileRenderer(gardenActor);
@@ -101,7 +108,7 @@ public class LudumCartridge : MachinaCartridge
         new GardenRenderer(gardenActor);
         gardenActor.Transform.Depth += 500;
 
-        var guy = gameScene.AddActor("Guy");
+        var guy = LudumCartridge.GameScene.AddActor("Guy");
         var box = new Box(guy, new Point(25, 50));
         box.Offset = new Point(box.Size.X / 2, box.Size.Y);
         new BoxRenderer(guy);
@@ -129,14 +136,14 @@ public class LudumCartridge : MachinaCartridge
 
                 farmer.EnqueueHarvestCrop(crop);
             }
-            else if (_inventory.HasGrabbedCard())
+            else if (Inventory.HasGrabbedCard())
             {
                 var canPlantHere = tiles.GetContentAt(position).IsWet && garden.IsEmpty(position);
                 if (canPlantHere)
                 {
-                    var crop = _inventory.GrabbedCard.Crop;
-                    _inventory.Discard(_inventory.GrabbedCard);
-                    _inventory.ClearGrabbedCard();
+                    var crop = Inventory.GrabbedCard.Crop;
+                    Inventory.Discard(Inventory.GrabbedCard);
+                    Inventory.ClearGrabbedCard();
 
                     farmer.ClearTween();
                     if (!farmerIsStandingOnTappedTile)
@@ -149,7 +156,7 @@ public class LudumCartridge : MachinaCartridge
                 }
                 else
                 {
-                    _inventory.ClearGrabbedCard();
+                    Inventory.ClearGrabbedCard();
                 }
             }
             else
@@ -158,7 +165,7 @@ public class LudumCartridge : MachinaCartridge
 
                 if (!farmerIsStandingOnTappedTile)
                 {
-                    _inventory.ClearGrabbedCard();
+                    Inventory.ClearGrabbedCard();
                     farmer.EnqueueGoToTile(position);
                 }
 
@@ -170,27 +177,19 @@ public class LudumCartridge : MachinaCartridge
     }
 }
 
-public class ResourceText : BaseComponent
+public class DebugComponent : BaseComponent
 {
-    private readonly Box _box;
-    private readonly Font _font;
-    private readonly Texture2D _icon;
-
-    public ResourceText(Actor actor) : base(actor)
+    public DebugComponent(Actor actor) : base(actor)
     {
-        _box = RequireComponent<Box>();
-        _font = Client.Assets.GetFont("GameFont", 32);
-        _icon = Client.Assets.GetTexture("energy");
     }
 
-    public override void Draw(Painter painter)
+    public override void OnKey(Keys key, ButtonState state, ModifierKeys modifiers)
     {
-        var rectangle = _box.Rectangle;
-        var iconPos = rectangle.Location.ToVector2() +
-                      new Vector2(_icon.Width / 2f, rectangle.Height / 2f - _icon.Height / 2f);
-        rectangle.Inflate(-_icon.Width, 0);
-        rectangle.Location += new Point(_icon.Width, 0);
-        painter.DrawAtPosition(_icon, iconPos);
-        painter.DrawStringWithinRectangle(_font, "100", rectangle, Alignment.BottomLeft, new DrawSettings());
+        if (Client.Debug.IsPassiveOrActive)
+        {
+            if (key == Keys.A)
+            {
+            }
+        }
     }
 }

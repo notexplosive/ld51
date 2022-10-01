@@ -59,20 +59,24 @@ public class Crop
             _tiles.PutTileContentAt(_position, _tiles.GetContentAt(_position).Downgrade());
             _level++;
 
-            Grew?.Invoke();
+            Grew?.Invoke(_position, _garden);
 
             if (IsReadyToHarvest)
             {
-                FinishedGrowing?.Invoke();
+                FinishedGrowing?.Invoke(_position, _garden);
             }
         }
     }
 
-    public event Action Grew;
-    public event Action FinishedGrowing;
+    public delegate void CropEvent(TilePosition position, Garden garden);
+    
+    public event CropEvent Grew;
+    public event CropEvent FinishedGrowing;
+    public event CropEvent Harvested;
 
     public void Harvest()
     {
         _garden.RemoveCropAt(_position);
+        Harvested?.Invoke(_position, _garden);
     }
 }
