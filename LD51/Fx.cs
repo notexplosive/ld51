@@ -1,4 +1,5 @@
-﻿using ExplogineMonoGame;
+﻿using System;
+using ExplogineMonoGame;
 using ExplogineMonoGame.Data;
 using ExTween;
 using ExTweenMonoGame;
@@ -29,14 +30,42 @@ public static class Fx
 
     private static void GainEnergyParticle(Vector2 worldPosition)
     {
-        var particle = Fx._uiScene.AddActor("EnergyParticle");
-        particle.Transform.Position = Fx.GameSpaceToUiSpace(worldPosition);
-        particle.Transform.Depth -= 100;
+        var particleParent = Fx._uiScene.AddActor("EnergyParticle");
+        particleParent.Transform.Position = Fx.GameSpaceToUiSpace(worldPosition);
+        particleParent.Transform.Depth -= 100;
+        var destination = Vector2.Zero;
+
+        var travelVector = destination - particleParent.Transform.Position;
+        travelVector.Normalize();
+        particleParent.Transform.Angle = MathF.Atan2(travelVector.Y, travelVector.X);
+
+        var particle = particleParent.Transform.AddActorAsChild("ParticleGraphic");
         new TextureRenderer(particle, Client.Assets.GetTexture("energy"));
-        var tweenable = new TweenableVector2(() => particle.Transform.Position, v => particle.Transform.Position = v);
+        // var tweenable = new TweenableVector2(() => particle.Transform.Position, v => particle.Transform.Position = v);
+
+        var parentPosition = new TweenableVector2(
+            () => particleParent.Transform.Position,
+            val => particleParent.Transform.Position = val);
+        var childPosition = new TweenableVector2(
+            () => particle.Transform.LocalPosition,
+            val => particle.Transform.LocalPosition = val);
+
+        var totalDuration = Client.Random.Dirty.NextFloat() * 0.25f + 0.5f;
         var tweenOwner = new TweenOwner(particle);
         tweenOwner.Tween = new SequenceTween()
-                .Add(new Tween<Vector2>(tweenable, Vector2.Zero, 1f, Ease.SineSlowFast))
+                .Add(
+                    new MultiplexTween()
+                        .AddChannel(new Tween<Vector2>(parentPosition, destination, totalDuration, Ease.SineSlowFast))
+                        .AddChannel(
+                            new SequenceTween()
+                                .Add(new Tween<Vector2>(childPosition,
+                                    new Vector2(0,
+                                        100 * Client.Random.Dirty.NextSign() * Client.Random.Dirty.NextFloat()),
+                                    totalDuration / 2, Ease.SineFastSlow))
+                                .Add(new Tween<Vector2>(childPosition, Vector2.Zero, totalDuration / 2,
+                                    Ease.SineSlowFast))
+                        )
+                )
                 .Add(new CallbackTween(particle.Destroy))
                 .Add(new CallbackTween(() => PlayerStats.Energy.Amount += 1))
             ;
