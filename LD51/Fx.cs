@@ -1,11 +1,9 @@
 ﻿using System;
 using ExplogineMonoGame;
-using ExplogineMonoGame.Data;
 using ExTween;
 using ExTweenMonoGame;
 using MachinaLite;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace LD51;
 
@@ -79,22 +77,5 @@ public static class Fx
     public static Vector2 GameSpaceToUiSpace(Vector2 gamePosition)
     {
         return Fx._uiScene.Camera.ScreenToWorld(Fx._gameScene.Camera.WorldToScreen(gamePosition));
-    }
-}
-
-public class TextureRenderer : BaseComponent
-{
-    private readonly Texture2D _texture2d;
-
-    public TextureRenderer(Actor actor, Texture2D texture2d) : base(actor)
-    {
-        _texture2d = texture2d;
-    }
-
-    public override void Draw(Painter painter)
-    {
-        painter.DrawAtPosition(_texture2d, Transform.Position, Scale2D.One,
-            new DrawSettings
-                {Angle = Transform.Angle, Color = Color.White, Depth = Transform.Depth, Origin = DrawOrigin.Center});
     }
 }

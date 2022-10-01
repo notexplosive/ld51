@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ExplogineCore;
 using ExplogineMonoGame;
 using ExplogineMonoGame.AssetManagement;
 using ExplogineMonoGame.Cartridges;
+using ExplogineMonoGame.Data;
 using ExplogineMonoGame.Input;
 using MachinaLite;
 using MachinaLite.Components;
@@ -101,7 +101,7 @@ public class LudumCartridge : MachinaCartridge
         new BoxRenderer(deckActor);
         new TextInBox(deckActor, A.CardTextFont, $"Draw Card\n({A.DrawCardCost} Energy)");
         var click = new Clickable(deckActor);
-        click.Clicked += (button) =>
+        click.Clicked += button =>
         {
             if (button == MouseButton.Left)
             {
@@ -131,9 +131,8 @@ public class LudumCartridge : MachinaCartridge
         gardenActor.Transform.Depth += 500;
 
         var guy = LudumCartridge.GameScene.AddActor("Guy");
-        var box = new Box(guy, new Point(25, 50));
-        box.Offset = new Point(box.Size.X / 2, box.Size.Y);
-        new BoxRenderer(guy);
+        var texture = Client.Assets.GetTexture("scarecrow");
+        new TextureRenderer(guy, texture, new DrawOrigin(new Vector2(texture.Width / 2f, texture.Height)));
         var farmer = new Farmer(guy, tiles);
 
         tiles.TileTapped += position =>

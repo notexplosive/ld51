@@ -25,6 +25,8 @@ public class Farmer : BaseComponent
     private readonly TweenableVector2 _tweenablePosition;
     private int _blockingFlags;
     private Tool _currentShownTool;
+    private float _totalWalkTime;
+    private bool _isWalking;
 
     public Farmer(Actor actor, Tiles tiles) : base(actor)
     {
@@ -50,12 +52,24 @@ public class Farmer : BaseComponent
     public override void Update(float dt)
     {
         _tween.Update(dt);
+
+        if (_isWalking)
+        {
+            _totalWalkTime += dt;
+            Transform.Angle = MathF.Sin(_totalWalkTime * 10) / 10;
+        }
+        else
+        {
+            _totalWalkTime = 0f;
+            Transform.Angle = 0;
+        }
     }
 
     public void ClearTween()
     {
         _blockingFlags = 0;
         _currentShownTool = Tool.None;
+        _isWalking = false;
         _tween.Clear();
     }
 
@@ -69,7 +83,12 @@ public class Farmer : BaseComponent
             return new SequenceTween();
         }
 
-        return new Tween<Vector2>(_tweenablePosition, target, duration, Ease.Linear);
+        return
+            new SequenceTween()
+                .Add(new CallbackTween(()=>_isWalking = true))
+                .Add(new Tween<Vector2>(_tweenablePosition, target, duration, Ease.Linear))
+                .Add(new CallbackTween(()=>_isWalking = false))
+            ;
     }
 
     public void EnqueueGoToTile(TilePosition tilePosition, bool blockInput = false)
