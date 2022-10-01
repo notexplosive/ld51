@@ -39,7 +39,7 @@ public class Crop
     {
         _totalTime += dt;
 
-        if (_tiles.GetContentAt(_position) == TileContent.Watered)
+        if (_tiles.GetContentAt(_position).IsWet)
         {
             _timeAtCurrentLevel += dt;
         }
@@ -56,7 +56,7 @@ public class Crop
 
         if (_level < _template.EffectiveMaxLevel)
         {
-            _tiles.PutTileContentAt(_position, TileContent.Tilled);
+            _tiles.PutTileContentAt(_position, _tiles.GetContentAt(_position).Downgrade());
             _level++;
 
             Grew?.Invoke();

@@ -151,7 +151,7 @@ public class Farmer : BaseComponent
             if (CurrentTile.HasValue)
             {
                 var tileContent = _tiles.GetContentAt(CurrentTile.Value);
-                if (tileContent == TileContent.Normal)
+                if (tileContent == TileContent.Dirt)
                 {
                     dynamicResult.Add(new CallbackTween(() => _toolAngle.Value = 0f));
                     dynamicResult.Add(ShowTool(Tool.Hoe));
@@ -161,7 +161,7 @@ public class Farmer : BaseComponent
                     dynamicResult.Add(new WaitSecondsTween(0.1f));
                 }
 
-                if (tileContent == TileContent.Tilled)
+                if (tileContent == TileContent.Tilled || tileContent.IsWet)
                 {
                     dynamicResult.Add(ShowTool(Tool.WateringCan));
                     dynamicResult.Add(new CallbackTween(() => _toolAngle.Value = 0f));

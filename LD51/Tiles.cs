@@ -20,7 +20,7 @@ public class Tiles : BaseComponent
         Dimensions = dimensions;
         foreach (var tilePosition in AllTilesPositions())
         {
-            _content[tilePosition] = TileContent.Normal;
+            _content[tilePosition] = TileContent.Dirt;
         }
     }
 

@@ -108,7 +108,7 @@ public class LudumCartridge : MachinaCartridge
             }
             else if (_inventory.HasGrabbedCard())
             {
-                var canPlantHere = tiles.GetContentAt(position) == TileContent.Watered && garden.IsEmpty(position);
+                var canPlantHere = tiles.GetContentAt(position).IsWet && garden.IsEmpty(position);
                 if (canPlantHere)
                 {
                     var crop = _inventory.GrabbedCard.Crop;
