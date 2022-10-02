@@ -74,6 +74,11 @@ public class Inventory : BaseComponent
         _cardsInHand.Remove(card);
         ArrangeCards();
     }
+
+    public bool IsFull()
+    {
+        return _cardsInHand.Count >= 6;
+    }
 }
 
 public class CardRenderer : BaseComponent

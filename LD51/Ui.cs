@@ -47,7 +47,7 @@ public class Ui
         {
             if (button == MouseButton.Left)
             {
-                if (deck.IsNotEmpty() && PlayerStats.Energy.CanAfford(A.DrawCardCost))
+                if (deck.IsNotEmpty() && PlayerStats.Energy.CanAfford(A.DrawCardCost) && !Inventory.IsFull())
                 {
                     PlayerStats.Energy.Consume(A.DrawCardCost);
                     Inventory.AddCard(deck.DrawCard());
