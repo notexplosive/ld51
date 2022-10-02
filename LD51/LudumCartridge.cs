@@ -68,6 +68,16 @@ public class LudumCartridge : MachinaCartridge
 
     public override void OnCartridgeStarted()
     {
+        #if !DEBUG 
+        var mainMenu = AddSceneAsLayer();
+        new MainMenu(mainMenu.AddActor("MainMenu"), BuildGameplay);
+        #else
+        BuildGameplay();
+        #endif
+    }
+
+    private void BuildGameplay()
+    {
         A.TileSheet = Client.Assets.GetAsset<SpriteSheet>("Tiles");
         A.TileRect = A.TileSheet.GetSourceRectForFrame(0);
 
@@ -88,7 +98,12 @@ public class LudumCartridge : MachinaCartridge
 
     public override void BeforeUpdate(float dt)
     {
-        LudumCartridge.Ui.Tooltip.Clear();
+        LudumCartridge.Ui?.Tooltip?.Clear();
+
+        if (Client.Input.Keyboard.GetButton(Keys.F4).WasPressed)
+        {
+            Client.Window.SetFullscreen(!Client.Window.IsFullscreen);
+        }
     }
 
     public override void AfterUpdate(float dt)
