@@ -19,7 +19,7 @@ internal class GardenRenderer : BaseComponent
             var crop = _garden.GetCropAt(tilePosition);
             var renderPos = tilePosition.Rectangle.Center.ToVector2();
 
-            crop.Draw(painter, renderPos, Transform.Depth - 2);
+            crop.Draw(painter, renderPos, Transform.Depth - 2 - tilePosition.GridPosition.Y);
         }
     }
 
