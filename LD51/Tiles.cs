@@ -57,56 +57,46 @@ public class Tiles : BaseComponent
 
     private void OnTileHovered(TilePosition tilePosition)
     {
-        var tapAction = LudumCartridge.World.GetTapAction(tilePosition, LudumCartridge.Ui.Inventory.GrabbedCard);
-        
         HoveredTile = tilePosition;
-        var content = GetContentAt(tilePosition);
+        
+        var tapAction = LudumCartridge.World.GetTapAction(tilePosition, LudumCartridge.Ui.Inventory.GrabbedCard);
 
-        var description = $"Costs {content.UpgradeCost()} Energy";
-        var skip = false;
-
-        if (LudumCartridge.World.Garden.HasCropAt(tilePosition))
+        var cropDescription = "";
+        var hasCrop = LudumCartridge.World.Garden.HasCropAt(tilePosition);
+        if (hasCrop)
         {
             var crop = LudumCartridge.World.Garden.GetCropAt(tilePosition);
-
-            description +=
-                $"\n{crop.Template.Name} {crop.Level + 1} / {crop.Template.EffectiveMaxLevel + 1}";
-
-            if (crop.IsReadyToHarvest)
+            if (!crop.IsReadyToHarvest)
             {
-                LudumCartridge.Ui.Tooltip.Set($"Harvest {crop.Template.Name}", $"{crop.Template.CropBehaviors.Harvested.Description()}");
-                skip = true;
+                cropDescription =
+                    $"{crop.Level + 1} / {crop.Template.EffectiveMaxLevel + 1}";
             }
         }
 
-        if (LudumCartridge.Ui.Inventory.HasGrabbedCard())
+        var newline = "\n";
+
+        if (cropDescription == "")
         {
-            skip = true;
-
-            if (content.IsWet)
-            {
-                var heldCrop = LudumCartridge.Ui.Inventory.GrabbedCard.CropTemplate;
-                LudumCartridge.Ui.Tooltip.Set($"Plant {heldCrop.Name}",
-                    $"Plant {heldCrop.Name} in {content.Name}\n{heldCrop.CropBehaviors.Planted.Description()}");
-            }
-            else
-            {
-                LudumCartridge.Ui.Tooltip.Set($"Can't Plant There",
-                    "Need Wet Soil");
-            }
+            newline = "";
         }
-
-        if (!skip)
+        
+        if (tapAction is TapError && hasCrop)
         {
-            LudumCartridge.Ui.Tooltip.Set($"{content.UpgradeVerb} {content.Name}", description);
+            var crop = LudumCartridge.World.Garden.GetCropAt(tilePosition);
+            LudumCartridge.Ui.Tooltip.Set(crop.Template.Name, $"{cropDescription}{newline}{GetContentAt(tilePosition).Name}");
         }
+        else
+        {
+            LudumCartridge.Ui.Tooltip.Set(tapAction.Title, $"{tapAction.Description}{newline}{cropDescription}");
+        }
+
     }
 
     public void SetContentAt(TilePosition tilePosition, TileContent content)
     {
         _content[tilePosition.GridPosition] = content;
     }
-    
+
     public void SetContentAt(Point gridPosition, TileContent content)
     {
         _content[gridPosition] = content;
@@ -135,7 +125,7 @@ public class Tiles : BaseComponent
     {
         return _content[tilePosition.GridPosition];
     }
-    
+
     public TileContent GetContentAt(Point gridPosition)
     {
         return _content[gridPosition];

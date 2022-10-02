@@ -33,7 +33,7 @@ public class World
             {
                 return;
             }
-            
+
             var heldCard = LudumCartridge.Ui.Inventory.GrabbedCard;
             LudumCartridge.Ui.Inventory.ClearGrabbedCard();
             _farmer.ClearTween();
@@ -55,57 +55,69 @@ public class World
     {
         if (Garden.HasCropAt(position) && Garden.GetCropAt(position).IsReadyToHarvest)
         {
-            return new TapAction(position, Color.Green, () =>
-            {
-                var crop = Garden.GetCropAt(position);
-                _farmer.EnqueueGoToTile(position);
-                _farmer.EnqueueHarvestCrop(crop);
-            });
+            return new TapAction($"Harvest {Garden.GetCropAt(position).Template.Name}",
+                $"{Garden.GetCropAt(position).Template.CropBehaviors.Harvested.Description()}", position, Color.Green,
+                () =>
+                {
+                    var crop = Garden.GetCropAt(position);
+                    _farmer.EnqueueGoToTile(position);
+                    _farmer.EnqueueHarvestCrop(crop);
+                });
         }
+
+        var content = Tiles.GetContentAt(position);
 
         if (heldCard != null)
         {
             if (Tiles.GetContentAt(position).IsWet && Garden.IsEmpty(position))
             {
-                return new TapAction(position, Color.White, () =>
-                {
-                    var template = heldCard.CropTemplate;
-                    LudumCartridge.Ui.Inventory.Remove(heldCard);
-                    _farmer.EnqueueGoToTile(position);
-                    _farmer.EnqueuePlantCrop(new CropEventData(position, Garden, template, Tiles));
-                });
+                var description = heldCard.CropTemplate.CropBehaviors.Planted.Description();
+                var newline = description == "" ?  "" : "\n";
+                
+                return new TapAction($"Plant {heldCard.CropTemplate.Name}",
+                    $"Plants crop in {content.Name}{newline}{description}",
+                    position, Color.White, () =>
+                    {
+                        var template = heldCard.CropTemplate;
+                        LudumCartridge.Ui.Inventory.Remove(heldCard);
+                        _farmer.EnqueueGoToTile(position);
+                        _farmer.EnqueuePlantCrop(new CropEventData(position, Garden, template, Tiles));
+                    });
             }
 
-            return new TapError("Cannot plant there");
+            return new TapError("Cannot plant there", "Need Wet Soil");
         }
 
-        var content = Tiles.GetContentAt(position);
         if (content.Upgrade() == content)
         {
-            return new TapError("No action to do there");
+            return new TapError("Fully watered", "Plant something here");
         }
 
         if (PlayerStats.Energy.CanAfford(content.UpgradeCost()))
         {
-            return new TapAction("",position, Color.Blue, () =>
-            {
-                _farmer.EnqueueGoToTile(position);
-                PlayerStats.Energy.Consume(content.UpgradeCost());
-                _farmer.EnqueueUpgradeCurrentTile();
-            });
+            return new TapAction($"{content.UpgradeVerb} {content.Name}", $"Costs {content.UpgradeCost()} Energy",
+                position, Color.Blue, () =>
+                {
+                    _farmer.EnqueueGoToTile(position);
+                    PlayerStats.Energy.Consume(content.UpgradeCost());
+                    _farmer.EnqueueUpgradeCurrentTile();
+                });
         }
 
-        return new TapError("Not enough Energy");
+        return new TapError("Not enough Energy", $"Need {content.UpgradeCost()} Energy to {content.UpgradeVerb}");
     }
 }
 
 public interface ITapAction
 {
-    void Execute();
     public Color Color { get; }
+    public string Title { get; }
+    public string Description { get; }
+    void Execute();
 }
 
-public record TapAction(string Description, TilePosition Position, Color Color, Action Behavior) : ITapAction
+public record TapAction
+    (string Title, string Description, TilePosition Position, Color Color, Action Behavior) : ITapAction
 {
     public void Execute()
     {
@@ -113,11 +125,11 @@ public record TapAction(string Description, TilePosition Position, Color Color, 
     }
 }
 
-public record TapError(string Message) : ITapAction
+public record TapError(string Title, string Description) : ITapAction
 {
     public void Execute()
     {
-        LudumCartridge.Ui.ErrorToast.ShowError(Message);
+        LudumCartridge.Ui.ErrorToast.ShowError(Title);
     }
 
     public Color Color => Color.Red;
