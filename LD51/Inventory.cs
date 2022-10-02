@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
+using ExplogineMonoGame.HitTesting;
+using ExplogineMonoGame.Input;
 using MachinaLite;
 using MachinaLite.Components;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace LD51;
 
@@ -14,6 +17,55 @@ public class Inventory : BaseComponent
     }
 
     public Card GrabbedCard { get; private set; }
+
+    public override void OnMouseButton(MouseButton button, Vector2 currentPosition, ButtonState state, HitTestStack hitTestStack)
+    {
+        if (button == MouseButton.Right && state == ButtonState.Pressed)
+        {
+            ClearGrabbedCard();
+        }
+    }
+
+    public override void OnKey(Keys key, ButtonState state, ModifierKeys modifiers)
+    {
+        if (state == ButtonState.Pressed && modifiers.None)
+        {
+            void TryGrab(int index)
+            {
+                var prevCard = GrabbedCard;
+                ClearGrabbedCard();
+                if (_cardsInHand.Count > index)
+                {
+                    if (prevCard != _cardsInHand[index])
+                    {
+                        Grab(_cardsInHand[index]);
+                    }
+                }
+            }
+
+            switch (key)
+            {
+                case Keys.D1:
+                    TryGrab(0);
+                    break;
+                case Keys.D2:
+                    TryGrab(1);
+                    break;
+                case Keys.D3:
+                    TryGrab(2);
+                    break;
+                case Keys.D4:
+                    TryGrab(3);
+                    break;
+                case Keys.D5:
+                    TryGrab(4);
+                    break;
+                case Keys.D6:
+                    TryGrab(5);
+                    break;
+            }
+        }
+    }
 
     public void AddCard(CropTemplate template)
     {
@@ -63,7 +115,7 @@ public class Inventory : BaseComponent
     {
         return GrabbedCard != null;
     }
-    
+
     public void Remove(Card card)
     {
         card.Actor.Destroy();
