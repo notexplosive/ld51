@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
 using ExplogineMonoGame;
+using ExplogineMonoGame.AssetManagement;
+using ExplogineMonoGame.Data;
 using ExTween;
 using ExTweenMonoGame;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace LD51;
 
@@ -82,6 +86,30 @@ public static class Fx
     }
 
     public static readonly SequenceTween EventTween = new();
+
+    public static void WaterTile(Point gridPosition)
+    {
+        var tiles = LudumCartridge.World.Tiles;
+        if (tiles.GetContentAt(gridPosition).IsTilled)
+        {
+            var water = LudumCartridge.World.Scene.AddActor("Water");
+            water.Transform.Position = tiles.GetRectangleAt(gridPosition).Center.ToVector2();
+            water.Transform.Depth += 50;
+
+            var spr = new SpriteRenderer(water,Client.Assets.GetAsset<SpriteSheet>("Water"));
+            spr.Color = Color.White.WithMultipliedOpacity(0.5f);
+            var tweenOwner = new TweenOwner(water);
+
+            tweenOwner.Tween = new SequenceTween()
+                .Add(new WaitSecondsTween(0.5f))
+                .Add(new CallbackTween(() =>
+                {
+                    tiles.SetContentAt(gridPosition, TileContent.WateredL3);
+                }))
+                .Add(new CallbackTween(water.Destroy))
+                ;
+        }
+    }
     
     public static void PutCardInDiscard(Vector2 worldPosition, CropTemplate template)
     {

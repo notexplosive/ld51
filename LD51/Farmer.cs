@@ -25,8 +25,8 @@ public class Farmer : BaseComponent
     private readonly TweenableVector2 _tweenablePosition;
     private int _blockingFlags;
     private Tool _currentShownTool;
-    private float _totalWalkTime;
     private bool _isWalking;
+    private float _totalWalkTime;
 
     public Farmer(Actor actor, Tiles tiles) : base(actor)
     {
@@ -85,9 +85,9 @@ public class Farmer : BaseComponent
 
         return
             new SequenceTween()
-                .Add(new CallbackTween(()=>_isWalking = true))
+                .Add(new CallbackTween(() => _isWalking = true))
                 .Add(new Tween<Vector2>(_tweenablePosition, target, duration, Ease.Linear))
-                .Add(new CallbackTween(()=>_isWalking = false))
+                .Add(new CallbackTween(() => _isWalking = false))
             ;
     }
 
@@ -99,10 +99,10 @@ public class Farmer : BaseComponent
         {
             Enqueue(HaltInput());
         }
-        
+
         Enqueue(WalkTo(tilePosition.Rectangle.Center.ToVector2() - new Vector2(A.TileRect.Width / 2f, 0)));
         Enqueue(new CallbackTween(() => { CurrentTile = tilePosition; }));
-        
+
         if (blockInput)
         {
             Enqueue(RestoreInput());
@@ -166,10 +166,10 @@ public class Farmer : BaseComponent
                 if (tileContent == TileContent.Tilled || tileContent.IsWet)
                 {
                     dynamicResult.Add(ShowTool(Tool.WateringCan));
+                    dynamicResult.Add(new CallbackTween(() => Fx.WaterTile(CurrentTile.Value.GridPosition)));
                     dynamicResult.Add(new CallbackTween(() => _toolAngle.Value = 0f));
                     dynamicResult.Add(new Tween<float>(_toolAngle, MathF.PI / 4f, 0.25f, Ease.QuadFastSlow));
                     dynamicResult.Add(new WaitSecondsTween(0.1f));
-                    dynamicResult.Add(new CallbackTween(UpgradeCurrentTile));
                     dynamicResult.Add(new WaitSecondsTween(0.1f));
                     dynamicResult.Add(new Tween<float>(_toolAngle, 0, 0.25f, Ease.QuadSlowFast));
                     dynamicResult.Add(new CallbackTween(() => { PlayerStats.Energy.Consume(A.WaterCost); }));
@@ -205,7 +205,7 @@ public class Farmer : BaseComponent
     {
         Enqueue(HaltInput());
         Enqueue(new WaitSecondsTween(0.25f));
-        Enqueue(new CallbackTween(()=>crop.Harvest()));
+        Enqueue(new CallbackTween(() => crop.Harvest()));
         Enqueue(RestoreInput());
     }
 }

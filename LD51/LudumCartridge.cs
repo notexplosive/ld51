@@ -28,25 +28,13 @@ public class LudumCartridge : MachinaCartridge
     public override IEnumerable<LoadEvent?> LoadEvents(Painter painter)
     {
         yield return
-            new LoadEvent("Tiles", () =>
-            {
-                var texture = Client.Assets.GetTexture("tiles");
-                return new GridBasedSpriteSheet(texture, new Point(64));
-            });
+            new LoadEvent("Tiles", () => new GridBasedSpriteSheet("tiles", new Point(64)));
 
         yield return
-            new LoadEvent("Plants", () =>
-            {
-                var texture = Client.Assets.GetTexture("plant");
-                return new GridBasedSpriteSheet(texture, new Point(128));
-            });
+            new LoadEvent("Plants", () => new GridBasedSpriteSheet("plant", new Point(128)));
 
         yield return
-            new LoadEvent("Tools", () =>
-            {
-                var texture = Client.Assets.GetTexture("tools");
-                return new GridBasedSpriteSheet(texture, new Point(64));
-            });
+            new LoadEvent("Tools", () => new GridBasedSpriteSheet("tools", new Point(64)));
 
         yield return new LoadEvent("UI-Patch", () =>
         {
@@ -67,13 +55,15 @@ public class LudumCartridge : MachinaCartridge
             return new NinepatchSheet(texture, new Rectangle(new Point(64, 0), new Point(64)),
                 new Rectangle(new Point(64 + 7, 7), new Point(50)));
         });
-        
+
         yield return new LoadEvent("Tooltip", () =>
         {
             var texture = Client.Assets.GetTexture("tooltip");
             return new NinepatchSheet(texture, new Rectangle(Point.Zero, new Point(64)),
                 new Rectangle(new Point(7), new Point(50)));
         });
+
+        yield return new LoadEvent("Water", () => new GridBasedSpriteSheet("water", new Point(64)));
     }
 
     public override void OnCartridgeStarted()
@@ -88,7 +78,7 @@ public class LudumCartridge : MachinaCartridge
         LudumCartridge.Ui = new Ui(LudumCartridge.UiScene);
 
         new DebugComponent(LudumCartridge.GameScene.AddActor("debug"));
-        
+
         // eventually this will happen in the cutscene
         PlayerStats.Energy.Gain(50);
         LudumCartridge.Ui.Inventory.AddCard(CropTemplate.Potato);
@@ -98,9 +88,9 @@ public class LudumCartridge : MachinaCartridge
 
     public override void BeforeUpdate(float dt)
     {
-        Ui.Tooltip.Clear();
+        LudumCartridge.Ui.Tooltip.Clear();
     }
-    
+
     public override void AfterUpdate(float dt)
     {
         // fx tween cleanup
@@ -114,7 +104,6 @@ public class LudumCartridge : MachinaCartridge
         }
     }
 }
-
 
 public class DebugComponent : BaseComponent
 {

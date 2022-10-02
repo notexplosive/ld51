@@ -116,11 +116,17 @@ public class Tiles : BaseComponent
         {
             for (var x = 0; x < Dimensions.X; x++)
             {
+                var xy = new Point(x, y);
                 yield return new TilePosition(
-                    new Point(x, y),
-                    new Rectangle(new Point(x * A.TileRect.Width, y * A.TileRect.Height), A.TileRect.Size));
+                    xy,
+                    GridPosToRectangle(xy));
             }
         }
+    }
+
+    private Rectangle GridPosToRectangle(Point xy)
+    {
+        return new Rectangle(new Point(xy.X * A.TileRect.Width, xy.Y * A.TileRect.Height), A.TileRect.Size);
     }
 
     public TileContent GetContentAt(TilePosition tilePosition)
@@ -131,5 +137,10 @@ public class Tiles : BaseComponent
     public TileContent GetContentAt(Point gridPosition)
     {
         return _content[gridPosition];
+    }
+
+    public Rectangle GetRectangleAt(Point gridPosition)
+    {
+        return GridPosToRectangle(gridPosition);
     }
 }

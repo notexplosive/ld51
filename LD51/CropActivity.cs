@@ -18,7 +18,6 @@ public record CropActivity(string Description, CropEvent Behavior)
     {
         return new CropActivity("Water neighboring Soil", data =>
         {
-            // todo: FX for this
             for (int x = -1; x <= 1; x++)
             {
                 for (int y = -1; y <= 1; y++)
@@ -28,7 +27,7 @@ public record CropActivity(string Description, CropEvent Behavior)
 
                     if (content.IsTilled)
                     {
-                        data.Tiles.SetContentAt(position, TileContent.WateredL3);
+                        Fx.WaterTile(position);
                     }
                 }
                 

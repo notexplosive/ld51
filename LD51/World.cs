@@ -11,19 +11,19 @@ public class World
     {
         Scene = scene;
         var gardenActor = scene.AddActor("Tiles");
-        var tiles = new Tiles(gardenActor, new Point(25));
+        Tiles = new Tiles(gardenActor, new Point(25));
         new TileRenderer(gardenActor);
         new SelectedTileRenderer(gardenActor);
-        Garden = new Garden(gardenActor, tiles);
+        Garden = new Garden(gardenActor, Tiles);
         new GardenRenderer(gardenActor);
         gardenActor.Transform.Depth += 500;
 
         var guy = scene.AddActor("Guy");
         var texture = Client.Assets.GetTexture("scarecrow");
         new TextureRenderer(guy, texture, new DrawOrigin(new Vector2(texture.Width / 2f, texture.Height)));
-        var farmer = new Farmer(guy, tiles);
+        var farmer = new Farmer(guy, Tiles);
 
-        tiles.TileTapped += position =>
+        Tiles.TileTapped += position =>
         {
             if (farmer.InputBlocked)
             {
@@ -47,7 +47,7 @@ public class World
             }
             else if (LudumCartridge.Ui.Inventory.HasGrabbedCard())
             {
-                var canPlantHere = tiles.GetContentAt(position).IsWet && Garden.IsEmpty(position);
+                var canPlantHere = Tiles.GetContentAt(position).IsWet && Garden.IsEmpty(position);
                 if (canPlantHere)
                 {
                     var template = LudumCartridge.Ui.Inventory.GrabbedCard.CropTemplate;
@@ -60,7 +60,7 @@ public class World
                         farmer.EnqueueGoToTile(position, true);
                     }
 
-                    farmer.EnqueuePlantCrop(new CropEventData(position, Garden, template, tiles));
+                    farmer.EnqueuePlantCrop(new CropEventData(position, Garden, template, Tiles));
                 }
                 else
                 {
@@ -70,7 +70,7 @@ public class World
             }
             else
             {
-                if (PlayerStats.Energy.CanAfford(tiles.GetContentAt(position).UpgradeCost()))
+                if (PlayerStats.Energy.CanAfford(Tiles.GetContentAt(position).UpgradeCost()))
                 {
                     farmer.ClearTween();
 
@@ -91,6 +91,8 @@ public class World
 
         guy.Transform.Position = new Vector2(500, 500);
     }
+
+    public Tiles Tiles { get; }
 
     public Garden Garden { get; }
 
