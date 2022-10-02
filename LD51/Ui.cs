@@ -9,10 +9,6 @@ namespace LD51;
 
 public class Ui
 {
-    public Scene Scene { get; }
-    public Inventory Inventory { get; }
-    public DiscardPile DiscardPile { get; }
-
     public Ui(Scene scene)
     {
         Scene = scene;
@@ -33,7 +29,7 @@ public class Ui
 
         Inventory = new Inventory(inventoryActor);
         Inventory.AddCard(CropTemplate.Potato);
-        Inventory.AddCard(CropTemplate.Potato);
+        Inventory.AddCard(CropTemplate.Watermelon);
         Inventory.AddCard(CropTemplate.Carrot);
 
         var rightPadding = 32;
@@ -45,8 +41,8 @@ public class Ui
         new Box(deckActor, A.CardSize);
         var deck = new Deck(deckActor);
         new Hoverable(deckActor);
-        new BoxRenderer(deckActor);
-        new TextInBox(deckActor, A.CardTextFont, $"Draw Card\n({A.DrawCardCost} Energy)");
+        new NinepatchRenderer(deckActor, Client.Assets.GetAsset<NinepatchSheet>("Card-Back"));
+        new TextInBox(deckActor, A.CardTextFont, $"Draw Card\n({A.DrawCardCost} Energy)").Color = Color.White;
         new Clickable(deckActor).Clicked += button =>
         {
             if (button == MouseButton.Left)
@@ -62,6 +58,7 @@ public class Ui
         var deckSize = deckActor.Transform.AddActorAsChild("DeckSizeActor");
         new Box(deckSize, new Point(A.CardSize.X, 70));
         var deckSizeText = new TextInBox(deckSize, A.BigFont, "0");
+        deckSizeText.Color = Color.White;
         new Updater(deckSize, _ => { deckSizeText.Text = deck.NumberOfCards.ToString(); });
 
         // Discard Pile
@@ -72,11 +69,11 @@ public class Ui
         discardActor.Transform.LocalDepth -= 10;
         new Box(discardActor, A.CardSize + new Point(0, discardHeaderSize));
         new Hoverable(discardActor);
-        new BoxRenderer(discardActor);
-        new TextInBox(discardActor, A.BigFont, "0");
+        new NinepatchRenderer(discardActor, Client.Assets.GetAsset<NinepatchSheet>("Card-Back"));
+        new TextInBox(discardActor, A.BigFont, "0").Color = Color.White;
         var discardHeader = discardActor.Transform.AddActorAsChild("DiscardHeader");
         new Box(discardHeader, new Point(A.CardSize.X, discardHeaderSize));
-        new TextInBox(discardHeader, A.UiHintFont, "Discard Pile");
+        new TextInBox(discardHeader, A.UiHintFont, "Discard Pile").Color = Color.White;
 
         DiscardPile = new DiscardPile(discardActor, deck);
 
@@ -108,4 +105,8 @@ public class Ui
         new NinepatchRenderer(inventoryBackground, sheet);
         new Hoverable(inventoryBackground);
     }
+
+    public Scene Scene { get; }
+    public Inventory Inventory { get; }
+    public DiscardPile DiscardPile { get; }
 }

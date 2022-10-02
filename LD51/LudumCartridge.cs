@@ -53,11 +53,19 @@ public class LudumCartridge : MachinaCartridge
             var texture = Client.Assets.GetTexture("ui-bg");
             return new NinepatchSheet(texture, texture.Bounds, new Rectangle(new Point(3), new Point(58)));
         });
-        
+
         yield return new LoadEvent("Card-Patch", () =>
         {
             var texture = Client.Assets.GetTexture("card");
-            return new NinepatchSheet(texture, texture.Bounds, new Rectangle(new Point(7), new Point(50)));
+            return new NinepatchSheet(texture, new Rectangle(Point.Zero, new Point(64)),
+                new Rectangle(new Point(7), new Point(50)));
+        });
+
+        yield return new LoadEvent("Card-Back", () =>
+        {
+            var texture = Client.Assets.GetTexture("card");
+            return new NinepatchSheet(texture, new Rectangle(new Point(64, 0), new Point(64)),
+                new Rectangle(new Point(64 + 7, 7), new Point(50)));
         });
     }
 
@@ -69,8 +77,8 @@ public class LudumCartridge : MachinaCartridge
         LudumCartridge.GameScene = AddSceneAsLayer();
         LudumCartridge.UiScene = AddSceneAsLayer();
 
-        LudumCartridge.World = new World(GameScene);
-        LudumCartridge.Ui = new Ui(UiScene);
+        LudumCartridge.World = new World(LudumCartridge.GameScene);
+        LudumCartridge.Ui = new Ui(LudumCartridge.UiScene);
 
         new DebugComponent(LudumCartridge.GameScene.AddActor("dbug"));
     }
