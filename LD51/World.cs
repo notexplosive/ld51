@@ -64,6 +64,7 @@ public class World
                 }
                 else
                 {
+                    LudumCartridge.Ui.ErrorToast.ShowError("Cannot plant there");
                     LudumCartridge.Ui.Inventory.ClearGrabbedCard();
                 }
             }
@@ -80,6 +81,10 @@ public class World
                     }
 
                     farmer.EnqueueUpgradeCurrentTile();
+                }
+                else
+                {
+                    LudumCartridge.Ui.ErrorToast.ShowError("Not enough Energy");
                 }
             }
         };

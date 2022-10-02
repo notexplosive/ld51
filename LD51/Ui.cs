@@ -1,6 +1,8 @@
 ﻿using ExplogineMonoGame;
 using ExplogineMonoGame.AssetManagement;
+using ExplogineMonoGame.Data;
 using ExplogineMonoGame.Input;
+using ExTween;
 using MachinaLite;
 using MachinaLite.Components;
 using Microsoft.Xna.Framework;
@@ -103,15 +105,68 @@ public class Ui
         new Box(inventoryBackground, new Point(totalScreenSize.X, A.CardSize.Y));
         new NinepatchRenderer(inventoryBackground, sheet);
         new Hoverable(inventoryBackground);
-        
+
         // Tooltip
-        var tooltipActor = scene.AddActor("tooltip");
+        var tooltipActor = scene.AddActor("Tooltip");
         tooltipActor.Transform.Depth = 100;
         tooltipActor.Transform.Position = new Vector2(16, 64);
         Tooltip = new Tooltip(tooltipActor);
+
+        // Error toast
+        var errorToast = scene.AddActor("Error");
+        errorToast.Transform.Depth = 120;
+        errorToast.Transform.Position = new Vector2(0, totalScreenSize.Y / 2 - A.BigFont.FontSize / 2);
+        ErrorToast = new ErrorToast(errorToast);
     }
+
+    public ErrorToast ErrorToast { get; }
 
     public Scene Scene { get; }
     public Inventory Inventory { get; }
     public DiscardPile DiscardPile { get; }
+}
+
+public class ErrorToast : BaseComponent
+{
+    private readonly TweenableFloat _opacity = new(0f);
+    private string _text;
+    private readonly SequenceTween _tween = new();
+
+    public ErrorToast(Actor actor) : base(actor)
+    {
+    }
+
+    public void ShowError(string errorText)
+    {
+        _tween.Clear();
+        _opacity.Value = 0f;
+        _text = errorText;
+        _tween.Add(new Tween<float>(_opacity, 1f, 0.25f, Ease.CubicFastSlow));
+        _tween.Add(new WaitSecondsTween(1));
+        _tween.Add(new Tween<float>(_opacity, 0f, 0.15f, Ease.CubicSlowFast));
+    }
+
+    public override void Update(float dt)
+    {
+        _tween.Update(dt);
+    }
+
+    public override void Draw(Painter painter)
+    {
+        var rect = new Rectangle(Transform.Position.ToPoint(),
+            new Point(Client.Window.RenderResolution.X, A.BigFont.FontSize));
+
+        var bgRect = rect;
+        bgRect.Inflate(0, 10);
+        bgRect.Inflate(0, -10 * _opacity);
+        painter.DrawRectangle(
+            bgRect,
+            new DrawSettings {Color = Color.Black.WithMultipliedOpacity(_opacity.Value / 2f), Depth = Transform.Depth});
+
+        painter.DrawStringWithinRectangle(A.BigFont, _text, rect, Alignment.Center, new DrawSettings
+            {
+                Color = Color.OrangeRed.WithMultipliedOpacity(_opacity.Value), Depth = Transform.Depth - 1
+            }
+        );
+    }
 }
