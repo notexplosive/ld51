@@ -31,7 +31,7 @@ public class Crop
 
     public void Draw(Painter painter, Vector2 renderPos, Depth depth)
     {
-        Client.Assets.GetAsset<SpriteSheet>("Plants").DrawFrame(painter, _template.CropLevel.FirstFrame + _level,
+        Client.Assets.GetAsset<SpriteSheet>("Plants").DrawFrame(painter, _template.CropGraphic.FirstFrame + _level,
             renderPos, Scale2D.One,
             new DrawSettings
                 {Color = Color.White, Depth = depth, Origin = DrawOrigin.Center, Angle = MathF.Sin(_totalTime) / 8f});
@@ -39,7 +39,10 @@ public class Crop
 
     public void Update(float dt)
     {
-        _totalTime += dt;
+        if (_data.Tiles.GetContentAt(_data.Position).IsWet)
+        {
+            _totalTime += dt;
+        }
 
         if (_tiles.GetContentAt(_position).IsWet)
         {
