@@ -22,21 +22,21 @@ public class MainMenu : BaseComponent
     {
         var wholeScreen = new Rectangle(Point.Zero, Client.Window.RenderResolution);
         var inset = wholeScreen;
-        inset.Inflate(0, -200);
+        inset.Inflate(0, -100);
 
         var insetMore = wholeScreen;
-        insetMore.Inflate(0, -320);
+        insetMore.Inflate(0, -220);
         
-        painter.DrawStringWithinRectangle(A.TitleScreenFont, "Last Fall",
+        painter.DrawStringWithinRectangle(A.TitleScreenFont, "Farm Golem",
             inset, Alignment.TopCenter, new DrawSettings());
         
         painter.DrawStringWithinRectangle(A.CardTextFont, "by NotExplosive",
             insetMore, Alignment.TopCenter, new DrawSettings());
         
-        painter.DrawStringWithinRectangle(A.BigFont, "Press F4 to toggle Fullscreen\nClick anywhere to begin",
+        painter.DrawStringWithinRectangle(A.TooltipTitleFont, "Press F4 to toggle Fullscreen\nClick anywhere to begin",
             inset, Alignment.Center, new DrawSettings());
         
-        painter.DrawStringWithinRectangle(A.BigFont, "notexplosive.net",
+        painter.DrawStringWithinRectangle(A.TooltipTitleFont, "notexplosive.net",
             inset, Alignment.BottomCenter, new DrawSettings());
     }
 
