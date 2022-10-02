@@ -115,6 +115,11 @@ public class Ui
         errorToast.Transform.Depth = 120;
         errorToast.Transform.Position = new Vector2(0, totalScreenSize.Y / 2 - A.BigFont.FontSize / 2);
         ErrorToast = new ErrorToast(errorToast);
+        
+        // Card Trail
+        var cardTrail = scene.AddActor("CardTrail");
+        cardTrail.Transform.Depth = 120;
+        new CardTrailRenderer(cardTrail);
     }
 
     public ErrorToast ErrorToast { get; }

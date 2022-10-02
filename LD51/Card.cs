@@ -13,9 +13,11 @@ public class Card : BaseComponent
 {
     private readonly Hoverable _hoverable;
     private readonly Inventory _inventory;
+    private readonly Box _box;
 
     public Card(Actor actor, Inventory inventory, CropTemplate cropTemplate) : base(actor)
     {
+        _box = RequireComponent<Box>();
         _hoverable = RequireComponent<Hoverable>();
         _inventory = inventory;
         CropTemplate = cropTemplate;
@@ -23,6 +25,7 @@ public class Card : BaseComponent
 
     public float HoverTimer { get; private set; }
     public CropTemplate CropTemplate { get; }
+    public Rectangle Rectangle => _box.Rectangle;
 
     public override void Update(float dt)
     {

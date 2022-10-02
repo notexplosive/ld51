@@ -96,7 +96,7 @@ public class World
         if (PlayerStats.Energy.CanAfford(content.UpgradeCost()))
         {
             return new TapAction($"{content.UpgradeVerb} {content.Name}", $"Costs {content.UpgradeCost()} Energy",
-                position, Color.LightBlue, () =>
+                position, Color.Cyan, () =>
                 {
                     _farmer.EnqueueGoToTile(position);
                     PlayerStats.Energy.Consume(content.UpgradeCost());
