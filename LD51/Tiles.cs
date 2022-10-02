@@ -57,6 +57,8 @@ public class Tiles : BaseComponent
 
     private void OnTileHovered(TilePosition tilePosition)
     {
+        var tapAction = LudumCartridge.World.GetTapAction(tilePosition, LudumCartridge.Ui.Inventory.GrabbedCard);
+        
         HoveredTile = tilePosition;
         var content = GetContentAt(tilePosition);
 

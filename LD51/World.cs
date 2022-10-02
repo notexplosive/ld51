@@ -1,4 +1,5 @@
-﻿using ExplogineMonoGame;
+﻿using System;
+using ExplogineMonoGame;
 using ExplogineMonoGame.Data;
 using MachinaLite;
 using Microsoft.Xna.Framework;
@@ -7,6 +8,8 @@ namespace LD51;
 
 public class World
 {
+    private readonly Farmer _farmer;
+
     public World(Scene scene)
     {
         Scene = scene;
@@ -20,63 +23,26 @@ public class World
         var guy = scene.AddActor("Guy");
         var texture = Client.Assets.GetTexture("scarecrow");
         new TextureRenderer(guy, texture, new DrawOrigin(new Vector2(texture.Width / 2f, texture.Height)));
-        var farmer = new Farmer(guy, Tiles);
+        _farmer = new Farmer(guy, Tiles);
 
-        new SelectedTileRenderer(gardenActor, farmer);
+        new SelectedTileRenderer(gardenActor, _farmer);
 
         Tiles.TileTapped += position =>
         {
-            if (farmer.InputBlocked)
+            if (_farmer.InputBlocked)
             {
                 return;
             }
-
+            
             var heldCard = LudumCartridge.Ui.Inventory.GrabbedCard;
             LudumCartridge.Ui.Inventory.ClearGrabbedCard();
-            farmer.ClearTween();
+            _farmer.ClearTween();
 
-            if (Garden.HasCropAt(position) && Garden.GetCropAt(position).IsReadyToHarvest)
-            {
-                var crop = Garden.GetCropAt(position);
-                farmer.EnqueueGoToTile(position);
-                farmer.EnqueueHarvestCrop(crop);
-            }
-            else if (heldCard != null)
-            {
-                var canPlantHere = Tiles.GetContentAt(position).IsWet && Garden.IsEmpty(position);
-                if (canPlantHere)
-                {
-                    var template = heldCard.CropTemplate;
-                    LudumCartridge.Ui.Inventory.Remove(heldCard);
-                    farmer.EnqueueGoToTile(position);
-                    farmer.EnqueuePlantCrop(new CropEventData(position, Garden, template, Tiles));
-                }
-                else
-                {
-                    LudumCartridge.Ui.ErrorToast.ShowError("Cannot plant there");
-                }
-            }
-            else
-            {
-                var content = Tiles.GetContentAt(position);
-                if (content.Upgrade() == content)
-                {
-                    LudumCartridge.Ui.ErrorToast.ShowError("No action to do there");
-                }
-                else if (PlayerStats.Energy.CanAfford(content.UpgradeCost()))
-                {
-                    farmer.EnqueueGoToTile(position);
-                    PlayerStats.Energy.Consume(content.UpgradeCost());
-                    farmer.EnqueueUpgradeCurrentTile();
-                }
-                else
-                {
-                    LudumCartridge.Ui.ErrorToast.ShowError("Not enough Energy");
-                }
-            }
+            GetTapAction(position, heldCard).Execute();
         };
 
-        guy.Transform.Position = new Vector2(Client.Window.RenderResolution.X / 2f, Client.Window.RenderResolution.Y / 2f);
+        guy.Transform.Position =
+            new Vector2(Client.Window.RenderResolution.X / 2f, Client.Window.RenderResolution.Y / 2f);
     }
 
     public Tiles Tiles { get; }
@@ -84,4 +50,75 @@ public class World
     public Garden Garden { get; }
 
     public Scene Scene { get; }
+
+    public ITapAction GetTapAction(TilePosition position, Card heldCard)
+    {
+        if (Garden.HasCropAt(position) && Garden.GetCropAt(position).IsReadyToHarvest)
+        {
+            return new TapAction(position, Color.Green, () =>
+            {
+                var crop = Garden.GetCropAt(position);
+                _farmer.EnqueueGoToTile(position);
+                _farmer.EnqueueHarvestCrop(crop);
+            });
+        }
+
+        if (heldCard != null)
+        {
+            if (Tiles.GetContentAt(position).IsWet && Garden.IsEmpty(position))
+            {
+                return new TapAction(position, Color.White, () =>
+                {
+                    var template = heldCard.CropTemplate;
+                    LudumCartridge.Ui.Inventory.Remove(heldCard);
+                    _farmer.EnqueueGoToTile(position);
+                    _farmer.EnqueuePlantCrop(new CropEventData(position, Garden, template, Tiles));
+                });
+            }
+
+            return new TapError("Cannot plant there");
+        }
+
+        var content = Tiles.GetContentAt(position);
+        if (content.Upgrade() == content)
+        {
+            return new TapError("No action to do there");
+        }
+
+        if (PlayerStats.Energy.CanAfford(content.UpgradeCost()))
+        {
+            return new TapAction("",position, Color.Blue, () =>
+            {
+                _farmer.EnqueueGoToTile(position);
+                PlayerStats.Energy.Consume(content.UpgradeCost());
+                _farmer.EnqueueUpgradeCurrentTile();
+            });
+        }
+
+        return new TapError("Not enough Energy");
+    }
+}
+
+public interface ITapAction
+{
+    void Execute();
+    public Color Color { get; }
+}
+
+public record TapAction(string Description, TilePosition Position, Color Color, Action Behavior) : ITapAction
+{
+    public void Execute()
+    {
+        Behavior();
+    }
+}
+
+public record TapError(string Message) : ITapAction
+{
+    public void Execute()
+    {
+        LudumCartridge.Ui.ErrorToast.ShowError(Message);
+    }
+
+    public Color Color => Color.Red;
 }
