@@ -12,6 +12,7 @@ namespace LD51;
 
 public class LudumCartridge : MachinaCartridge
 {
+    private bool _gameStarted;
     private static Scene GameScene { get; set; }
     private static Scene UiScene { get; set; }
 
@@ -80,6 +81,7 @@ public class LudumCartridge : MachinaCartridge
 
     private void BuildGameplay()
     {
+        _gameStarted = true;
         A.TileSheet = Client.Assets.GetAsset<SpriteSheet>("Tiles");
         A.TileRect = A.TileSheet.GetSourceRectForFrame(0);
 
@@ -192,17 +194,20 @@ public class LudumCartridge : MachinaCartridge
 
     public override void AfterUpdate(float dt)
     {
-        // fx tween cleanup
-        if (Fx.EventTween.IsDone())
+        if (_gameStarted)
         {
-            Fx.EventTween.Clear();
-        }
-        else
-        {
-            Fx.EventTween.Update(dt);
-        }
+            // fx tween cleanup
+            if (Fx.EventTween.IsDone())
+            {
+                Fx.EventTween.Clear();
+            }
+            else
+            {
+                Fx.EventTween.Update(dt);
+            }
 
-        LudumCartridge.Cutscene.Tween.Update(dt);
+            LudumCartridge.Cutscene.Tween.Update(dt);
+        }
     }
 }
 
