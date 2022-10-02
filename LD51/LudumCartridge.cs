@@ -88,6 +88,12 @@ public class LudumCartridge : MachinaCartridge
         LudumCartridge.Ui = new Ui(LudumCartridge.UiScene);
 
         new DebugComponent(LudumCartridge.GameScene.AddActor("debug"));
+        
+        // eventually this will happen in the cutscene
+        PlayerStats.Energy.Gain(50);
+        LudumCartridge.Ui.Inventory.AddCard(CropTemplate.Potato);
+        LudumCartridge.Ui.Inventory.AddCard(CropTemplate.Watermelon);
+        LudumCartridge.Ui.Inventory.AddCard(CropTemplate.Carrot);
     }
 
     public override void BeforeUpdate(float dt)

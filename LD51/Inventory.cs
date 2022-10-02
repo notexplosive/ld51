@@ -51,7 +51,7 @@ public class Inventory : BaseComponent
 
     public bool IsGrabbed(Card card)
     {
-        return GrabbedCard != card;
+        return GrabbedCard == card;
     }
 
     public void Grab(Card card)

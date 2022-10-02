@@ -17,5 +17,10 @@ public static class PlayerStats
         {
             Amount -= cost;
         }
+
+        public void Gain(int gain)
+        {
+            Amount += gain;
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using ExplogineMonoGame.HitTesting;
 using ExplogineMonoGame.Input;
+using ExTween;
 using MachinaLite;
 using MachinaLite.Components;
 using Microsoft.Xna.Framework;
@@ -25,24 +26,29 @@ public class Card : BaseComponent
 
     public override void Update(float dt)
     {
-        if (_inventory.IsGrabbed(this))
+        if (!_inventory.IsGrabbed(this))
         {
             if (_hoverable.IsHovered)
             {
-                HoverTimer += dt * 5;
+                HoverTimer += dt * 10;
             }
             else
             {
-                HoverTimer -= dt * 10;
+                HoverTimer -= dt * 20;
             }
 
             HoverTimer = Math.Clamp(HoverTimer, 0f, 1f);
 
-            Transform.LocalPosition = new Vector2(Transform.LocalPosition.X, -HoverTimer * 40f);
+            Transform.LocalPosition = new Vector2(Transform.LocalPosition.X, -Ease.CubicFastSlow(HoverTimer) * 60f);
         }
         else
         {
-            Transform.LocalPosition = new Vector2(Transform.LocalPosition.X, -80);
+            Transform.LocalPosition = new Vector2(Transform.LocalPosition.X, -70);
+        }
+
+        if (_hoverable.IsHovered)
+        {
+            LudumCartridge.Ui.Tooltip.Set($"{CropTemplate.Name}", $"{CropTemplate.Description}");
         }
     }
 
@@ -53,7 +59,14 @@ public class Card : BaseComponent
         {
             if (state == ButtonState.Pressed)
             {
-                _inventory.Grab(this);
+                if (_inventory.IsGrabbed(this))
+                {
+                    _inventory.ClearGrabbedCard();
+                }
+                else
+                {
+                    _inventory.Grab(this);
+                }
             }
         }
     }

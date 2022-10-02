@@ -58,6 +58,7 @@ public record CropTemplate(string Name, int TickLength, Rarity Rarity, AlwaysNev
     public bool IsRecyclable => RecycleStatus == AlwaysNever.Always;
 
     public int EffectiveMaxLevel => CropGraphic.NumberOfFrames - 1;
+    public string Description { get; }
 
     public Crop CreateCrop(CropEventData data)
     {

@@ -77,6 +77,23 @@ public class Tiles : BaseComponent
             }
         }
 
+        if (LudumCartridge.Ui.Inventory.HasGrabbedCard())
+        {
+            skip = true;
+
+            if (content.IsWet)
+            {
+                var heldCrop = LudumCartridge.Ui.Inventory.GrabbedCard.CropTemplate.Name;
+                LudumCartridge.Ui.Tooltip.Set($"Plant {heldCrop}",
+                    $"Plant {heldCrop} in {content.Name}");
+            }
+            else
+            {
+                LudumCartridge.Ui.Tooltip.Set($"Can't Plant There",
+                    "Need Wet Soil");
+            }
+        }
+
         if (!skip)
         {
             LudumCartridge.Ui.Tooltip.Set($"{content.UpgradeVerb} {content.Name}", description);

@@ -69,15 +69,18 @@ public class World
             }
             else
             {
-                farmer.ClearTween();
-
-                if (!farmerIsStandingOnTappedTile)
+                if (PlayerStats.Energy.CanAfford(tiles.GetContentAt(position).UpgradeCost()))
                 {
-                    LudumCartridge.Ui.Inventory.ClearGrabbedCard();
-                    farmer.EnqueueGoToTile(position);
-                }
+                    farmer.ClearTween();
 
-                farmer.EnqueueUpgradeCurrentTile();
+                    if (!farmerIsStandingOnTappedTile)
+                    {
+                        LudumCartridge.Ui.Inventory.ClearGrabbedCard();
+                        farmer.EnqueueGoToTile(position);
+                    }
+
+                    farmer.EnqueueUpgradeCurrentTile();
+                }
             }
         };
 

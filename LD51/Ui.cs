@@ -30,9 +30,6 @@ public class Ui
         inventoryActor.Transform.Position = new Vector2(0, totalScreenSize.Y - A.CardSize.Y * 2f / 3);
 
         Inventory = new Inventory(inventoryActor);
-        Inventory.AddCard(CropTemplate.Potato);
-        Inventory.AddCard(CropTemplate.Watermelon);
-        Inventory.AddCard(CropTemplate.Carrot);
 
         var rightPadding = 32;
 

@@ -16,16 +16,16 @@ public class Tooltip : BaseComponent
 
     public Tooltip(Actor actor) : base(actor)
     {
-        CurrentContent = new Content("Title","This is some test text, to see how much we can fit on the tooltip at once.");
+        _currentContent = new Content("Title","This is some test text, to see how much we can fit on the tooltip at once.");
         _textFont = A.TooltipTextFont;
         _titleFont = A.TooltipTitleFont;
     }
 
-    public Content CurrentContent { get; private set; }
+    private Content _currentContent;
 
     public override void Draw(Painter painter)
     {
-        if (string.IsNullOrEmpty(CurrentContent.Title))
+        if (string.IsNullOrEmpty(_currentContent.Title))
         {
             return;
         }
@@ -35,10 +35,10 @@ public class Tooltip : BaseComponent
 
 
         var maxWidth = 600f;
-        var titleBounds = _titleFont.MeasureString(CurrentContent.Title);
+        var titleBounds = _titleFont.MeasureString(_currentContent.Title);
         maxWidth = MathF.Max(titleBounds.X + 5, maxWidth);
         
-        var maxBounds = _textFont.MeasureString(CurrentContent.Text, maxWidth);
+        var maxBounds = _textFont.MeasureString(_currentContent.Text, maxWidth);
         maxBounds += new Vector2(0, _titleFont.FontSize);
         maxBounds.X = MathF.Max(maxWidth, maxBounds.X);
 
@@ -54,19 +54,19 @@ public class Tooltip : BaseComponent
         var descriptionRect = new Rectangle(Transform.Position.ToPoint() + new Point(0, _titleFont.FontSize),
             new Point(allTextRect.Width, allTextRect.Height - _titleFont.FontSize));
 
-        painter.DrawStringWithinRectangle(_titleFont, CurrentContent.Title, titleRect, Alignment.CenterLeft,
+        painter.DrawStringWithinRectangle(_titleFont, _currentContent.Title, titleRect, Alignment.CenterLeft,
             new DrawSettings {Color = Color.White});
-        painter.DrawStringWithinRectangle(_textFont, CurrentContent.Text, descriptionRect, Alignment.TopLeft,
+        painter.DrawStringWithinRectangle(_textFont, _currentContent.Text, descriptionRect, Alignment.TopLeft,
             new DrawSettings {Color = Color.White});
     }
 
     public void Clear()
     {
-        CurrentContent = new Content();
+        _currentContent = new Content();
     }
     
     public void Set(string title, string description)
     {
-        CurrentContent = new Content(title, description);
+        _currentContent = new Content(title, description);
     }
 }
