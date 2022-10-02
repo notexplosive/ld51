@@ -17,7 +17,7 @@ public class Tutorial : BaseComponent
 
     private string _currentMessage;
     private float _time;
-    private Queue<Trigger> _triggerQueue = new();
+    private readonly Queue<Trigger> _triggerQueue = new();
 
     public Tutorial(Actor actor) : base(actor)
     {
@@ -34,9 +34,12 @@ public class Tutorial : BaseComponent
 
     public override void Update(float dt)
     {
-        _time += dt;
+        if (!LudumCartridge.Cutscene.IsPlaying())
+        {
+            _time += dt;
+        }
 
-        if (_triggerQueue.TryPeek(out Trigger result))
+        if (_triggerQueue.TryPeek(out var result))
         {
             if (result.Condition())
             {
@@ -48,20 +51,28 @@ public class Tutorial : BaseComponent
 
     public override void Draw(Painter painter)
     {
+        if (_time < 2)
+        {
+            return;
+        }
+
         if (HighlightedRect.HasValue)
         {
+            var color = Color.Cyan;
+            
             foreach (var rect in Lines())
             {
-                painter.DrawRectangle(rect, new DrawSettings {Color = Color.LimeGreen.WithMultipliedOpacity(0.75f)});
+                painter.DrawRectangle(rect, new DrawSettings {Color = color.WithMultipliedOpacity(0.75f)});
             }
 
             var textRect = HighlightedRect.Value;
             textRect.Inflate(10000, 0);
             textRect.Height = A.CardTextFont.FontSize + 5;
-            textRect.Location = new Point(textRect.Location.X, HighlightedRect.Value.Location.Y - 100);
+            textRect.Location = new Point(textRect.Location.X, HighlightedRect.Value.Location.Y - 100 +
+                                                               (int) (MathF.Sin(_time * 4) * 10));
 
             painter.DrawStringWithinRectangle(A.CardTextFont, _currentMessage, textRect, Alignment.Center,
-                new DrawSettings {Color = Color.LimeGreen.WithMultipliedOpacity(0.75f)});
+                new DrawSettings {Color = color.WithMultipliedOpacity(1f)});
         }
     }
 
@@ -96,10 +107,10 @@ public class Tutorial : BaseComponent
         _triggerQueue.Enqueue(new Trigger(condition, result));
     }
 
-    private readonly record struct Trigger(Func<bool> Condition, Action Result);
-
     public void Clear()
     {
         HighlightedRect = null;
     }
+
+    private readonly record struct Trigger(Func<bool> Condition, Action Result);
 }

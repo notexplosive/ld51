@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using ExplogineMonoGame;
+using ExplogineMonoGame.Data;
 using ExTween;
 using ExTweenMonoGame;
 using MachinaLite;
+using MachinaLite.Components;
 using Microsoft.Xna.Framework;
 
 namespace LD51;
@@ -12,6 +14,8 @@ public class Cutscene
     private readonly CutsceneDeck _deck;
     private readonly TweenableVector2 _deckPosition = new(Vector2.Zero);
     private readonly TweenableFloat _faderOpacity = new(0f);
+    private string _text;
+    private readonly Tweenable<float> _textOpacity = new TweenableFloat(0f);
 
     public Cutscene(Scene scene)
     {
@@ -26,6 +30,15 @@ public class Cutscene
 
         var startPosition = new Vector2(Client.Window.RenderResolution.X / 2f, Client.Window.RenderResolution.Y + 200);
         _deckPosition.Value = startPosition;
+
+        var textActor = scene.AddActor("Text");
+        new Box(textActor, Client.Window.RenderResolution);
+        var textInBox = new TextInBox(textActor, A.BigFont, "");
+        new Updater(textActor, _ =>
+        {
+            textInBox.Text = _text;
+            textInBox.Color = Color.White.WithMultipliedOpacity(_textOpacity.Value);
+        });
     }
 
     public Scene Scene { get; }
@@ -69,14 +82,15 @@ public class Cutscene
             }));
             Tween.Add(new WaitSecondsTween(0.1f));
         }
-        
+
         for (var i = 0; i < 1; i++)
         {
-            Tween.Add(new CallbackTween(() => Fx.PutCardInDiscard(Fx.UiSpaceToGameSpace(ui.ReshuffleButtonBox.Rectangle.Center.ToVector2()), CropTemplate.Potato)));
+            Tween.Add(new CallbackTween(() =>
+                Fx.PutCardInDiscard(Fx.UiSpaceToGameSpace(ui.ReshuffleButtonBox.Rectangle.Center.ToVector2()),
+                    CropTemplate.Potato)));
         }
-        
+
         Tween.Add(new WaitSecondsTween(1f));
-        
 
         Tween.Add(new CallbackTween(() => world.Garden.KillAllCrops()));
         Tween.Add(new WaitSecondsTween(0.05f));
@@ -87,7 +101,7 @@ public class Cutscene
         Tween.Add(new CallbackTween(() => world.Tiles.DrainAllSoil()));
         Tween.Add(new WaitSecondsTween(0.05f));
         Tween.Add(new CallbackTween(() => world.Tiles.DrainAllSoil()));
-        
+
         Tween.Add(new WaitSecondsTween(1));
 
         Tween.Add(new Tween<float>(_faderOpacity, 1f, 0.5f, Ease.Linear));
@@ -149,5 +163,26 @@ public class Cutscene
                     }
                 })
         );
+    }
+
+    public void PlayOpening()
+    {
+        _faderOpacity.Value = 1f;
+
+        void EnqueShowMessage(string message, float lingerDuration = 2f)
+        {
+            Tween.Add(new CallbackTween(() => _text = message));
+            Tween.Add(new Tween<float>(_textOpacity, 1f, 0.5f, Ease.Linear));
+            Tween.Add(new WaitSecondsTween(lingerDuration));
+            Tween.Add(new Tween<float>(_textOpacity, 0f, 0.5f, Ease.Linear));
+            Tween.Add(new CallbackTween(() => _text = ""));
+        }
+
+        EnqueShowMessage("Somewhere in the wasteland, 100 years after the Calamity...");
+        EnqueShowMessage("A Golem awakens, it's mission carved into its mind.");
+        
+        Tween.Add(new Tween<float>(_faderOpacity, 0f, 1f, Ease.Linear));
+        
+        EnqueShowMessage("\"Restore this forgotten wasteland\"", 2);
     }
 }

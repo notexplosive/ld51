@@ -3,9 +3,11 @@ using ExplogineCore;
 using ExplogineMonoGame;
 using ExplogineMonoGame.AssetManagement;
 using ExplogineMonoGame.Cartridges;
+using ExplogineMonoGame.Data;
 using ExplogineMonoGame.Input;
 using MachinaLite;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace LD51;
@@ -67,6 +69,27 @@ public class LudumCartridge : MachinaCartridge
         });
 
         yield return new LoadEvent("Water", () => new GridBasedSpriteSheet("water", new Point(64)));
+        
+        yield return new LoadEvent("MenuBackground", () =>
+        {
+            var canvas = new Canvas(512, 512);
+            var tiles = Client.Assets.GetAsset<SpriteSheet>("Tiles");
+
+            Client.Graphics.PushCanvas(canvas);
+            Client.Graphics.Painter.BeginSpriteBatch(SamplerState.LinearWrap, Matrix.Identity);
+            var ints = new[] {0, 2, 3};
+            for (int x = 0; x < canvas.Size.X; x += 64)
+            {
+                for (int y = 0; y < canvas.Size.Y; y += 64)
+                {
+                    tiles.DrawFrame(Client.Graphics.Painter, Client.Random.Dirty.GetRandomElement(ints), new Vector2(x,y), Scale2D.One, new DrawSettings());
+                }
+            }
+            Client.Graphics.Painter.EndSpriteBatch();
+            Client.Graphics.PopCanvas();
+
+            return canvas.AsTextureAsset();
+        });
     }
 
     public override void OnCartridgeStarted()
@@ -82,6 +105,7 @@ public class LudumCartridge : MachinaCartridge
     private void BuildGameplay()
     {
         _gameStarted = true;
+        
         A.TileSheet = Client.Assets.GetAsset<SpriteSheet>("Tiles");
         A.TileRect = A.TileSheet.GetSourceRectForFrame(0);
 
@@ -180,6 +204,8 @@ public class LudumCartridge : MachinaCartridge
         }
 
         ui.Inventory.DrawNextCard(true);
+        
+        Cutscene.PlayOpening();
     }
 
     public override void BeforeUpdate(float dt)
