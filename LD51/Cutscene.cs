@@ -169,7 +169,7 @@ public class Cutscene
     {
         _faderOpacity.Value = 1f;
 
-        void EnqueShowMessage(string message, float lingerDuration = 2f)
+        void EnqueueShowMessage(string message, float lingerDuration = 2f)
         {
             Tween.Add(new CallbackTween(() => _text = message));
             Tween.Add(new Tween<float>(_textOpacity, 1f, 0.5f, Ease.Linear));
@@ -178,11 +178,11 @@ public class Cutscene
             Tween.Add(new CallbackTween(() => _text = ""));
         }
 
-        EnqueShowMessage("Somewhere in the wasteland, 100 years after the Calamity...");
-        EnqueShowMessage("A Golem awakens, it's mission carved into its mind.");
+        EnqueueShowMessage("Somewhere in the wasteland, 100 years after the Calamity...");
+        EnqueueShowMessage("A Golem awakens, it's mission carved into its mind.");
         
         Tween.Add(new Tween<float>(_faderOpacity, 0f, 1f, Ease.Linear));
         
-        EnqueShowMessage("\"Restore this forgotten wasteland\"", 2);
+        EnqueueShowMessage("\"Restore this forgotten wasteland\"", 2);
     }
 }
