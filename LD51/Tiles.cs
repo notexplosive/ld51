@@ -39,7 +39,7 @@ public class Tiles : BaseComponent
     public override void OnMouseButton(MouseButton button, Vector2 currentPosition, ButtonState state,
         HitTestStack hitTestStack)
     {
-        if (button == MouseButton.Left && state == ButtonState.Pressed)
+        if (button == MouseButton.Left && state == ButtonState.Pressed && !LudumCartridge.Cutscene.IsPlaying())
         {
             if (HoveredTile.HasValue)
             {

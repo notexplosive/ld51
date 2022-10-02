@@ -17,9 +17,11 @@ public class LudumCartridge : MachinaCartridge
 
     public override CartridgeConfig CartridgeConfig { get; } = new(new Point(1600, 900));
 
-    public static Ui Ui { get; set; }
+    public static Ui Ui { get; private set; }
 
-    public static World World { get; set; }
+    public static World World { get; private set; }
+
+    public static Cutscene Cutscene { get; private set; }
 
     public override void AddCommandLineParameters(CommandLineParametersWriter parameters)
     {
@@ -53,7 +55,7 @@ public class LudumCartridge : MachinaCartridge
         {
             var texture = Client.Assets.GetTexture("card");
             return new NinepatchSheet(texture, new Rectangle(new Point(64, 0), new Point(64)),
-                new Rectangle(new Point(64 + 7, 7), new Point(50)));
+                new Rectangle(new Point(64 + 10, 10), new Point(44)));
         });
 
         yield return new LoadEvent("Tooltip", () =>
@@ -68,12 +70,12 @@ public class LudumCartridge : MachinaCartridge
 
     public override void OnCartridgeStarted()
     {
-        #if !DEBUG 
+#if !DEBUG
         var mainMenu = AddSceneAsLayer();
         new MainMenu(mainMenu.AddActor("MainMenu"), BuildGameplay);
-        #else
+#else
         BuildGameplay();
-        #endif
+#endif
     }
 
     private void BuildGameplay()
@@ -86,6 +88,7 @@ public class LudumCartridge : MachinaCartridge
 
         LudumCartridge.World = new World(LudumCartridge.GameScene);
         LudumCartridge.Ui = new Ui(LudumCartridge.UiScene);
+        LudumCartridge.Cutscene = new Cutscene(AddSceneAsLayer());
 
         new DebugComponent(LudumCartridge.GameScene.AddActor("debug"));
 
@@ -100,7 +103,7 @@ public class LudumCartridge : MachinaCartridge
     {
         LudumCartridge.Ui?.Tooltip?.Clear();
 
-        if (Client.Input.Keyboard.GetButton(Keys.F4).WasPressed)
+        if (Client.Input.Keyboard.GetButton(Keys.F4).WasPressed && Client.Input.Keyboard.Modifiers.None)
         {
             Client.Window.SetFullscreen(!Client.Window.IsFullscreen);
         }
@@ -117,6 +120,8 @@ public class LudumCartridge : MachinaCartridge
         {
             Fx.EventTween.Update(dt);
         }
+
+        LudumCartridge.Cutscene.Tween.Update(dt);
     }
 }
 

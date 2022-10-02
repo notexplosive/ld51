@@ -25,7 +25,7 @@ public class Tooltip : BaseComponent
 
     public override void Draw(Painter painter)
     {
-        if (string.IsNullOrEmpty(_currentContent.Title))
+        if (string.IsNullOrEmpty(_currentContent.Title) || LudumCartridge.Cutscene.IsPlaying())
         {
             return;
         }

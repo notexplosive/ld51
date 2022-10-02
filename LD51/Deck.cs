@@ -30,7 +30,7 @@ public class Deck : BaseComponent
         return _content.Count > 0;
     }
 
-    public CropTemplate DrawCard()
+    public CropTemplate NextTemplate()
     {
         return _content.Pop();
     }

@@ -12,7 +12,8 @@ public class DiscardPile : BaseComponent
     private readonly Deck _deck;
     private readonly Box _box;
 
-    public Rectangle Rectangle => _box.Rectangle; 
+    public Rectangle Rectangle => _box.Rectangle;
+    public int Count => _content.Count;
 
     public DiscardPile(Actor actor, Deck deck) : base(actor)
     {
@@ -26,8 +27,9 @@ public class DiscardPile : BaseComponent
         _text.Text = _content.Count.ToString();
     }
 
-    public void Reshuffle(Deck deck)
+    public void Reshuffle()
     {
+        var deck = LudumCartridge.Ui.Deck;
         while (_content.Count > 0)
         {
             deck.AddCard(_content.Pop());

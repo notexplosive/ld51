@@ -17,10 +17,11 @@ public class Inventory : BaseComponent
     }
 
     public Card GrabbedCard { get; private set; }
+    public int Count => _cardsInHand.Count;
 
     public override void OnMouseButton(MouseButton button, Vector2 currentPosition, ButtonState state, HitTestStack hitTestStack)
     {
-        if (button == MouseButton.Right && state == ButtonState.Pressed)
+        if (button == MouseButton.Right && state == ButtonState.Pressed && !LudumCartridge.Cutscene.IsPlaying())
         {
             ClearGrabbedCard();
         }
@@ -28,7 +29,7 @@ public class Inventory : BaseComponent
 
     public override void OnKey(Keys key, ButtonState state, ModifierKeys modifiers)
     {
-        if (state == ButtonState.Pressed && modifiers.None)
+        if (state == ButtonState.Pressed && modifiers.None && !LudumCartridge.Cutscene.IsPlaying())
         {
             void TryGrab(int index)
             {
@@ -126,5 +127,15 @@ public class Inventory : BaseComponent
     public bool IsFull()
     {
         return _cardsInHand.Count >= 6;
+    }
+    
+    public bool IsEmpty()
+    {
+        return _cardsInHand.Count == 0;
+    }
+
+    public Card GetCard(int i)
+    {
+        return _cardsInHand[i];
     }
 }

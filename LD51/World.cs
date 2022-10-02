@@ -1,6 +1,6 @@
-﻿using System;
-using ExplogineMonoGame;
+﻿using ExplogineMonoGame;
 using ExplogineMonoGame.Data;
+using ExTween;
 using MachinaLite;
 using Microsoft.Xna.Framework;
 
@@ -44,10 +44,13 @@ public class World
             new Vector2(Client.Window.RenderResolution.X / 2f, Client.Window.RenderResolution.Y / 2f);
     }
 
+    public bool FarmerIsBusy()
+    {
+        return _farmer.InputBlocked;
+    }
+    
     public Tiles Tiles { get; }
-
     public Garden Garden { get; }
-
     public Scene Scene { get; }
 
     public ITapAction GetTapAction(TilePosition position, Card heldCard)
@@ -105,31 +108,9 @@ public class World
 
         return new TapError("Not enough Energy", $"Need {content.UpgradeCost()} Energy to {content.UpgradeVerb}");
     }
-}
 
-public interface ITapAction
-{
-    public Color Color { get; }
-    public string Title { get; }
-    public string Description { get; }
-    void Execute();
-}
-
-public record TapAction
-    (string Title, string Description, TilePosition Position, Color Color, Action Behavior) : ITapAction
-{
-    public void Execute()
+    public Vector2 GetFarmerPosition()
     {
-        Behavior();
+        return _farmer.Transform.Position;
     }
-}
-
-public record TapError(string Title, string Description) : ITapAction
-{
-    public void Execute()
-    {
-        LudumCartridge.Ui.ErrorToast.ShowError(Title);
-    }
-
-    public Color Color => Color.DarkRed;
 }

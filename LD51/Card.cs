@@ -58,7 +58,7 @@ public class Card : BaseComponent
     public override void OnMouseButton(MouseButton button, Vector2 currentPosition, ButtonState state,
         HitTestStack hitTestStack)
     {
-        if (_hoverable.IsHovered && button == MouseButton.Left)
+        if (_hoverable.IsHovered && button == MouseButton.Left && !LudumCartridge.Cutscene.IsPlaying())
         {
             if (state == ButtonState.Pressed)
             {

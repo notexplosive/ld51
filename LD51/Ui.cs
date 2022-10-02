@@ -38,18 +38,18 @@ public class Ui
         deckActor.Transform.LocalPosition += new Vector2(totalScreenSize.X - A.CardSize.X - rightPadding, 0);
         deckActor.Transform.LocalDepth -= 10;
         new Box(deckActor, A.CardSize);
-        var deck = new Deck(deckActor);
+        Deck = new Deck(deckActor);
         new Hoverable(deckActor);
         new NinepatchRenderer(deckActor, Client.Assets.GetAsset<NinepatchSheet>("Card-Back"));
         new TextInBox(deckActor, A.CardTextFont, $"Draw Card\n({A.DrawCardCost} Energy)").Color = Color.White;
         new Clickable(deckActor).Clicked += button =>
         {
-            if (button == MouseButton.Left)
+            if (button == MouseButton.Left && !LudumCartridge.Cutscene.IsPlaying())
             {
-                if (deck.IsNotEmpty() && PlayerStats.Energy.CanAfford(A.DrawCardCost) && !Inventory.IsFull())
+                if (Deck.IsNotEmpty() && PlayerStats.Energy.CanAfford(A.DrawCardCost) && !Inventory.IsFull())
                 {
                     PlayerStats.Energy.Consume(A.DrawCardCost);
-                    Inventory.AddCard(deck.DrawCard());
+                    Inventory.AddCard(Deck.NextTemplate());
                 }
             }
         };
@@ -58,7 +58,7 @@ public class Ui
         new Box(deckSize, new Point(A.CardSize.X, 70));
         var deckSizeText = new TextInBox(deckSize, A.BigFont, "0");
         deckSizeText.Color = Color.White;
-        new Updater(deckSize, _ => { deckSizeText.Text = deck.NumberOfCards.ToString(); });
+        new Updater(deckSize, _ => { deckSizeText.Text = Deck.NumberOfCards.ToString(); });
 
         // Discard Pile
         var discardActor = inventoryActor.Transform.AddActorAsChild("Deck");
@@ -74,7 +74,7 @@ public class Ui
         new Box(discardHeader, new Point(A.CardSize.X, discardHeaderSize));
         new TextInBox(discardHeader, A.UiHintFont, "Discard Pile").Color = Color.White;
 
-        DiscardPile = new DiscardPile(discardActor, deck);
+        DiscardPile = new DiscardPile(discardActor, Deck);
 
         // Reshuffle Button
         var reshuffleButtonActor = inventoryActor.Transform.AddActorAsChild("Deck");
@@ -92,11 +92,12 @@ public class Ui
         );
         new Clickable(reshuffleButtonActor).Clicked += button =>
         {
-            if (button == MouseButton.Left)
+            if (button == MouseButton.Left && !LudumCartridge.Cutscene.IsPlaying() && !LudumCartridge.World.FarmerIsBusy())
             {
-                DiscardPile.Reshuffle(deck);
+                LudumCartridge.Cutscene.PlayReshuffle();
             }
         };
+        new TooltipOwner(reshuffleButtonActor, "Reshuffle", "Go to sleep for a few years.\nReshuffle your deck and gain some energy\nGain a few Common Seeds for free\nAll your crops will die and some soil will decay.");
 
         var inventoryBackground = inventoryActor.Transform.AddActorAsChild("Background");
         inventoryBackground.Transform.LocalPosition += new Vector2(0, 32);
@@ -121,6 +122,8 @@ public class Ui
         cardTrail.Transform.Depth = 120;
         new CardTrailRenderer(cardTrail);
     }
+
+    public Deck Deck { get; }
 
     public ErrorToast ErrorToast { get; }
 

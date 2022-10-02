@@ -34,7 +34,7 @@ public class Farmer : BaseComponent
     }
 
     public TilePosition CurrentTile { get; set; }
-    public bool InputBlocked => !_tween.IsDone();
+    public bool InputBlocked => !_tween.IsDone() || LudumCartridge.Cutscene.IsPlaying();
 
     public override void Draw(Painter painter)
     {
