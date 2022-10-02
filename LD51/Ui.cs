@@ -9,6 +9,8 @@ namespace LD51;
 
 public class Ui
 {
+    public readonly Tooltip Tooltip;
+
     public Ui(Scene scene)
     {
         Scene = scene;
@@ -104,6 +106,12 @@ public class Ui
         new Box(inventoryBackground, new Point(totalScreenSize.X, A.CardSize.Y));
         new NinepatchRenderer(inventoryBackground, sheet);
         new Hoverable(inventoryBackground);
+        
+        // Tooltip
+        var tooltipActor = scene.AddActor("tooltip");
+        tooltipActor.Transform.Depth = 100;
+        tooltipActor.Transform.Position = new Vector2(16, 64);
+        Tooltip = new Tooltip(tooltipActor);
     }
 
     public Scene Scene { get; }

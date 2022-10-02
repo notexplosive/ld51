@@ -67,6 +67,13 @@ public class LudumCartridge : MachinaCartridge
             return new NinepatchSheet(texture, new Rectangle(new Point(64, 0), new Point(64)),
                 new Rectangle(new Point(64 + 7, 7), new Point(50)));
         });
+        
+        yield return new LoadEvent("Tooltip", () =>
+        {
+            var texture = Client.Assets.GetTexture("tooltip");
+            return new NinepatchSheet(texture, new Rectangle(Point.Zero, new Point(64)),
+                new Rectangle(new Point(7), new Point(50)));
+        });
     }
 
     public override void OnCartridgeStarted()
@@ -81,18 +88,16 @@ public class LudumCartridge : MachinaCartridge
         LudumCartridge.Ui = new Ui(LudumCartridge.UiScene);
 
         new DebugComponent(LudumCartridge.GameScene.AddActor("debug"));
-        new Appendix(LudumCartridge.GameScene.AddActor("appendix"));
-    }
-}
-
-public class Appendix : BaseComponent
-{
-    public Appendix(Actor actor) : base(actor)
-    {
     }
 
-    public override void Update(float dt)
+    public override void BeforeUpdate(float dt)
     {
+        Ui.Tooltip.Clear();
+    }
+    
+    public override void AfterUpdate(float dt)
+    {
+        // fx tween cleanup
         if (Fx.EventTween.IsDone())
         {
             Fx.EventTween.Clear();
@@ -103,6 +108,7 @@ public class Appendix : BaseComponent
         }
     }
 }
+
 
 public class DebugComponent : BaseComponent
 {

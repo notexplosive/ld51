@@ -60,6 +60,8 @@ public class Tiles : BaseComponent
     private void OnTileHovered(TilePosition tilePosition)
     {
         HoveredTile = tilePosition;
+        var content = GetContentAt(tilePosition);
+        LudumCartridge.Ui.Tooltip.Set($"{content.UpgradeVerb} {content.Name}", $"Costs {content.UpgradeCost()} Energy");
     }
 
     public void PutTileContentAt(TilePosition tilePosition, TileContent content)
