@@ -1,3 +1,3 @@
 ﻿namespace LD51;
 
-public record CropLevel(int MaxLevel, int FirstFrame);
+public record CropLevel(int NumberOfFrames, int FirstFrame);

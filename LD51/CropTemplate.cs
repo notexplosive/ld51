@@ -25,8 +25,16 @@ public record CropTemplate(string Name, int TickLength, CropLevel CropLevel, Cro
         new OnHarvestTrigger(
             data => { Fx.GainEnergy(data.Position.Rectangle.Center.ToVector2(), 50); })
     );
+    
+    public static CropTemplate Watermelon = new(
+        "Watermelon", 
+        5,
+        new CropLevel(4, 10),
+        new OnHarvestTrigger(
+            data => { /*Water adjacent crops*/ })
+    );
 
-    public int EffectiveMaxLevel => CropLevel.MaxLevel - 1;
+    public int EffectiveMaxLevel => CropLevel.NumberOfFrames - 1;
 
     public Crop CreateCrop(Garden garden, TilePosition position, Tiles tiles)
     {
