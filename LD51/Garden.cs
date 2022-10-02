@@ -6,11 +6,9 @@ namespace LD51;
 public class Garden : BaseComponent
 {
     private readonly Dictionary<TilePosition, Crop> _map = new();
-    private readonly Tiles _tiles;
 
-    public Garden(Actor actor, Tiles tiles) : base(actor)
+    public Garden(Actor actor) : base(actor)
     {
-        _tiles = tiles;
     }
 
     public void PlantCrop(CropEventData data)
@@ -39,6 +37,11 @@ public class Garden : BaseComponent
         return _map.Values;
     }
 
+    public bool HasAnyCrop()
+    {
+        return _map.Count > 0;
+    }
+
     public bool HasCropAt(TilePosition position)
     {
         return _map.ContainsKey(position);
@@ -52,5 +55,28 @@ public class Garden : BaseComponent
     public void KillAllCrops()
     {
         _map.Clear();
+    }
+
+    public IEnumerable<Crop> AllWateredCrops()
+    {
+        foreach (var kv in _map)
+        {
+            var position = kv.Key;
+            if (LudumCartridge.World.Tiles.GetContentAt(position).IsWet)
+            {
+                yield return kv.Value;
+            }
+        }
+    }
+
+    public IEnumerable<Crop> AllReadyCrops()
+    {
+        foreach (var crop in _map.Values)
+        {
+            if (crop.IsReadyToHarvest)
+            {
+                yield return crop;
+            }
+        }
     }
 }

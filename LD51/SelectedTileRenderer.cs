@@ -17,7 +17,7 @@ public class SelectedTileRenderer : BaseComponent
 
     public override void Draw(Painter painter)
     {
-        if (_tiles.HoveredTile.HasValue && !_farmer.InputBlocked)
+        if (_tiles.HoveredTile.HasValue && !_farmer.IsAnimating)
         {
             var rect = _tiles.HoveredTile.Value.Rectangle;
             rect.Inflate(-10, -10);

@@ -1,4 +1,5 @@
-﻿using ExplogineMonoGame;
+﻿using System.Linq;
+using ExplogineMonoGame;
 using ExplogineMonoGame.Data;
 using ExTween;
 using MachinaLite;
@@ -13,12 +14,13 @@ public class World
     public World(Scene scene)
     {
         Scene = scene;
+
         var gardenActor = scene.AddActor("Tiles");
+        gardenActor.Transform.Depth += 500;
         Tiles = new Tiles(gardenActor, new Point(25));
         new TileRenderer(gardenActor);
-        Garden = new Garden(gardenActor, Tiles);
+        Garden = new Garden(gardenActor);
         new GardenRenderer(gardenActor);
-        gardenActor.Transform.Depth += 500;
 
         var guy = scene.AddActor("Guy");
         var texture = Client.Assets.GetTexture("scarecrow");
@@ -29,7 +31,7 @@ public class World
 
         Tiles.TileTapped += position =>
         {
-            if (_farmer.InputBlocked)
+            if (_farmer.IsAnimating)
             {
                 return;
             }
@@ -44,9 +46,10 @@ public class World
             new Vector2(Client.Window.RenderResolution.X / 2f, Client.Window.RenderResolution.Y / 2f);
     }
 
+
     public bool FarmerIsBusy()
     {
-        return _farmer.InputBlocked;
+        return _farmer.IsAnimating;
     }
     
     public Tiles Tiles { get; }
@@ -117,5 +120,33 @@ public class World
     public Vector2 GetFarmerPosition()
     {
         return _farmer.Transform.Position;
+    }
+
+    public bool IsSoftLocked()
+    {
+        var ui = LudumCartridge.Ui;
+        var world = LudumCartridge.World;
+
+        if (_farmer.IsAnimating)
+        {
+            return false;
+        }
+        
+        var outOfCards = ui.Deck.IsEmpty() && ui.Inventory.Count == 0;
+        var noCrops = !world.Garden.HasAnyCrop();
+        var cannotPlayAnyCards = ui.Inventory.Count == 0 || !world.Tiles.HasAnyWateredTiles();
+        var cannotDraw = !PlayerStats.Energy.CanAfford(A.DrawCardCost) || ui.Deck.IsEmpty();
+        var noPendingCrops = world.Garden.AllWateredCrops().ToList().Count == 0 && world.Garden.AllReadyCrops().ToList().Count == 0;
+        var cannotWaterAnyTiles = !world.Tiles.HasAnyContent(TileContent.Tilled) || !PlayerStats.Energy.CanAfford(A.WaterCost);
+        var cannotTillAnyTiles = !world.Tiles.HasAnyContent(TileContent.Dirt) || !PlayerStats.Energy.CanAfford(A.TillCost);
+
+        if (outOfCards && noCrops)
+        {
+            // More permissive: there's nothing _interesting_ you can do
+            return cannotPlayAnyCards && cannotDraw && noPendingCrops;
+        }
+
+        // Rock bottom: there are zero actions you can do
+        return cannotPlayAnyCards && cannotDraw && noPendingCrops && cannotWaterAnyTiles && cannotTillAnyTiles;
     }
 }

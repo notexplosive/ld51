@@ -72,7 +72,7 @@ public class Cutscene
         
         for (var i = 0; i < 1; i++)
         {
-            Tween.Add(new CallbackTween(() => Fx.PutCardInDiscard(world.GetFarmerPosition(), CropTemplate.Potato)));
+            Tween.Add(new CallbackTween(() => Fx.PutCardInDiscard(Fx.UiSpaceToGameSpace(ui.ReshuffleButtonBox.Rectangle.Center.ToVector2()), CropTemplate.Potato)));
         }
         
         Tween.Add(new WaitSecondsTween(1f));

@@ -17,7 +17,12 @@ public class Tiles : BaseComponent
     public Tiles(Actor actor, Point dimensions) : base(actor)
     {
         Dimensions = dimensions;
-        RandomizeContent();
+        foreach (var tilePosition in AllTilesPositions())
+        {
+            _content[tilePosition.GridPosition] = TileContent.Dead;
+        }
+        
+        _content[new Point(12, 5)] = TileContent.Dirt;
     }
 
     public void RandomizeContent()
@@ -161,5 +166,44 @@ public class Tiles : BaseComponent
             var content = GetContentAt(tile);
             SetContentAt(tile,content.Drain());
         }
+    }
+
+    public bool HasAnyContent(TileContent targetContent)
+    {
+        foreach (var content in _content.Values)
+        {
+            if (content == targetContent)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    public Point? GetATileWithContent(TileContent targetContent)
+    {
+        foreach (var kv in _content)
+        {
+            if (kv.Value == targetContent)
+            {
+                return kv.Key;
+            }
+        }
+
+        return null;
+    }
+
+    public bool HasAnyWateredTiles()
+    {
+        foreach (var tile in AllTilesPositions())
+        {
+            if (GetContentAt(tile).IsWet)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

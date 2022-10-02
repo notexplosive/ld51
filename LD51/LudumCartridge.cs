@@ -92,11 +92,92 @@ public class LudumCartridge : MachinaCartridge
 
         new DebugComponent(LudumCartridge.GameScene.AddActor("debug"));
 
+        var ui = LudumCartridge.Ui;
+        var tutorial = ui.Tutorial;
+
+        var world = LudumCartridge.World;
+        tutorial.TellPlayerToClickOn(world.Tiles.GetRectangleAt(new Point(12, 5)),
+            "Click On Dirt to Till");
+        tutorial.AddTrigger(
+            () => world.Tiles.HasAnyContent(TileContent.Tilled),
+            () =>
+            {
+                var location = world.Tiles.GetATileWithContent(TileContent.Tilled);
+                if (location.HasValue)
+                {
+                    tutorial.TellPlayerToClickOn(
+                        world.Tiles.GetRectangleAt(location.Value), "Click on Tilled Soil to water it");
+                }
+            });
+        tutorial.AddTrigger(
+            () => world.Tiles.HasAnyContent(TileContent.WateredL3),
+            () =>
+            {
+                tutorial.TellPlayerToClickOn(
+                    ui.Inventory.GetCard(0).Rectangle, "Select a Seed");
+            });
+
+        tutorial.AddTrigger(
+            () => ui.Inventory.HasGrabbedCard(),
+            () =>
+            {
+                var location = world.Tiles.GetATileWithContent(TileContent.WateredL3);
+                if (location.HasValue)
+                {
+                    tutorial.TellPlayerToClickOn(
+                        world.Tiles.GetRectangleAt(location.Value), "Plant it!");
+                }
+            });
+
+        tutorial.AddTrigger(
+            () => world.Garden.HasAnyCrop(),
+            () =>
+            {
+                tutorial.Clear();
+                world.Tiles.SetContentAt(new Point(10, 5), TileContent.Dirt);
+                world.Tiles.SetContentAt(new Point(14, 5), TileContent.Dirt);
+            });
+
+        tutorial.AddTrigger(
+            () => !world.Garden.HasAnyCrop()
+                  || !(world.Tiles.HasAnyContent(TileContent.Tilled) ||
+                       world.Tiles.HasAnyContent(TileContent.Dirt)),
+            () =>
+            {
+                tutorial.TellPlayerToClickOn(
+                    ui.Deck.Rectangle, "Draw more Seeds");
+            });
+
+        tutorial.AddTrigger(
+            () => ui.Inventory.Count > 0,
+            () => { tutorial.Clear(); });
+
+        tutorial.AddTrigger(
+            () => world.IsSoftLocked(),
+            () =>
+            {
+                tutorial.TellPlayerToClickOn(
+                    ui.ReshuffleButtonBox.Rectangle, "Nothing else you can do...");
+            });
+        
+        tutorial.AddTrigger(
+            ()=> LudumCartridge.Cutscene.IsPlaying(),
+            () =>
+            {
+                Fx.PutCardInDiscard(Fx.UiSpaceToGameSpace(ui.ReshuffleButtonBox.Rectangle.Center.ToVector2()), CropTemplate.Carrot);
+                Fx.PutCardInDiscard(Fx.UiSpaceToGameSpace(ui.ReshuffleButtonBox.Rectangle.Center.ToVector2()), CropTemplate.Carrot);
+                tutorial.Clear();
+            });
+
         // eventually this will happen in the cutscene
-        PlayerStats.Energy.Gain(50);
-        LudumCartridge.Ui.Inventory.AddCard(CropTemplate.Potato);
-        LudumCartridge.Ui.Inventory.AddCard(CropTemplate.Watermelon);
-        LudumCartridge.Ui.Inventory.AddCard(CropTemplate.Carrot);
+        PlayerStats.Energy.Gain(80);
+
+        for (var i = 0; i < 5; i++)
+        {
+            ui.Deck.AddCard(CropTemplate.Potato);
+        }
+
+        ui.Inventory.DrawNextCard(true);
     }
 
     public override void BeforeUpdate(float dt)

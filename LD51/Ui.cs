@@ -17,6 +17,10 @@ public class Ui
         var totalScreenSize = Client.Window.RenderResolution;
         var sheet = Client.Assets.GetAsset<NinepatchSheet>("UI-Patch");
 
+        // Tutorial
+        Tutorial = new Tutorial(scene.AddActor("Tutorial"));
+        Tutorial.Transform.Depth = 25;
+        
         var resourcesActor = scene.AddActor("Resources");
         var resourcesBox = new Box(resourcesActor, new Point(totalScreenSize.X, 50));
         new NinepatchRenderer(resourcesActor, sheet);
@@ -77,10 +81,11 @@ public class Ui
         reshuffleButtonActor.Transform.LocalPosition +=
             new Vector2(totalScreenSize.X - A.CardSize.X * 3 - rightPadding * 3, A.CardSize.Y / 4f);
         reshuffleButtonActor.Transform.LocalDepth -= 10;
-        new Box(reshuffleButtonActor, new Point(A.CardSize.X, A.CardSize.Y / 4));
+        ReshuffleButtonBox = new Box(reshuffleButtonActor, new Point(A.CardSize.X, A.CardSize.Y / 4));
         var renderer = new BoxRenderer(reshuffleButtonActor);
         new TextInBox(reshuffleButtonActor, A.CardTextFont, "Reshuffle");
         new Hoverable(reshuffleButtonActor);
+        new ReshuffleButton(reshuffleButtonActor);
         new ChangeOnHovered(
             reshuffleButtonActor,
             () => { renderer.Color = Color.LightBlue; },
@@ -93,7 +98,7 @@ public class Ui
                 LudumCartridge.Cutscene.PlayReshuffle();
             }
         };
-        new TooltipOwner(reshuffleButtonActor, "Reshuffle", "Go to sleep for a few years.\nReshuffle your deck and gain some energy.\nChance to gain a free Common Seeds.\nAll your crops will die soil will decay.");
+        new TooltipOwner(reshuffleButtonActor, "Reshuffle", "Go to sleep for a few years.\nReshuffle your deck and gain some energy.\nChance to gain a free Common Seed.\nAll your crops will die soil will decay.");
 
         var inventoryBackground = inventoryActor.Transform.AddActorAsChild("Background");
         inventoryBackground.Transform.LocalPosition += new Vector2(0, 32);
@@ -119,6 +124,8 @@ public class Ui
         new CardTrailRenderer(cardTrail);
     }
 
+    public Box ReshuffleButtonBox { get; }
+
     public Deck Deck { get; }
 
     public ErrorToast ErrorToast { get; }
@@ -126,4 +133,17 @@ public class Ui
     public Scene Scene { get; }
     public Inventory Inventory { get; }
     public DiscardPile DiscardPile { get; }
+    public Tutorial Tutorial { get; }
+}
+
+public class ReshuffleButton : BaseComponent
+{
+    public ReshuffleButton(Actor actor) : base(actor)
+    {
+    }
+
+    public override void Update(float dt)
+    {
+        Actor.Visible = LudumCartridge.World.IsSoftLocked();
+    }
 }
