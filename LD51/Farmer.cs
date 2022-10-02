@@ -113,7 +113,7 @@ public class Farmer : BaseComponent
     {
         if (CurrentTile != null)
         {
-            _tiles.PutTileContentAt(CurrentTile.Value, _tiles.GetContentAt(CurrentTile.Value).Upgrade());
+            _tiles.SetContentAt(CurrentTile.Value, _tiles.GetContentAt(CurrentTile.Value).Upgrade());
         }
     }
 

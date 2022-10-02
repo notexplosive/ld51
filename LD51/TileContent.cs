@@ -26,6 +26,8 @@ public class TileContent
         Name = name;
     }
 
+    public bool IsTilled => Trait == ContentTrait.Tilled || Trait == ContentTrait.Wet;
+
     public string Name { get; }
     public ContentTrait Trait { get; }
     public int Frame { get; }

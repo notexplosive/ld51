@@ -7,6 +7,8 @@ using Microsoft.Xna.Framework;
 
 namespace LD51;
 
+public delegate void CropEvent(CropEventData data);
+
 public class Crop
 {
     private readonly TilePosition _position;
@@ -62,7 +64,7 @@ public class Crop
 
         if (CurrentFrameOffset < Template.EffectiveMaxLevel)
         {
-            _tiles.PutTileContentAt(_position, _tiles.GetContentAt(_position).Downgrade());
+            _tiles.SetContentAt(_position, _tiles.GetContentAt(_position).Downgrade());
             CurrentFrameOffset++;
 
             Grew?.Invoke(_data);
@@ -73,8 +75,6 @@ public class Crop
             }
         }
     }
-
-    public delegate void CropEvent(CropEventData data);
     
     public event CropEvent Grew;
     public event CropEvent FinishedGrowing;

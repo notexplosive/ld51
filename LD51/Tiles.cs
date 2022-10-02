@@ -11,14 +11,14 @@ public class Tiles : BaseComponent
 {
     public delegate void TileEvent(TilePosition tilePosition);
 
-    private readonly Dictionary<TilePosition, TileContent> _content = new();
+    private readonly Dictionary<Point, TileContent> _content = new();
 
     public Tiles(Actor actor, Point dimensions) : base(actor)
     {
         Dimensions = dimensions;
         foreach (var tilePosition in AllTilesPositions())
         {
-            _content[tilePosition] = TileContent.Dirt;
+            _content[tilePosition.GridPosition] = TileContent.Dirt;
         }
     }
 
@@ -72,7 +72,7 @@ public class Tiles : BaseComponent
 
             if (crop.IsReadyToHarvest)
             {
-                LudumCartridge.Ui.Tooltip.Set($"Harvest {crop.Template.Name}", "Harvest it!");
+                LudumCartridge.Ui.Tooltip.Set($"Harvest {crop.Template.Name}", $"{crop.Template.CropBehaviors.Harvested.Description()}");
                 skip = true;
             }
         }
@@ -83,9 +83,9 @@ public class Tiles : BaseComponent
 
             if (content.IsWet)
             {
-                var heldCrop = LudumCartridge.Ui.Inventory.GrabbedCard.CropTemplate.Name;
-                LudumCartridge.Ui.Tooltip.Set($"Plant {heldCrop}",
-                    $"Plant {heldCrop} in {content.Name}");
+                var heldCrop = LudumCartridge.Ui.Inventory.GrabbedCard.CropTemplate;
+                LudumCartridge.Ui.Tooltip.Set($"Plant {heldCrop.Name}",
+                    $"Plant {heldCrop.Name} in {content.Name}\n{heldCrop.CropBehaviors.Planted.Description()}");
             }
             else
             {
@@ -100,9 +100,14 @@ public class Tiles : BaseComponent
         }
     }
 
-    public void PutTileContentAt(TilePosition tilePosition, TileContent content)
+    public void SetContentAt(TilePosition tilePosition, TileContent content)
     {
-        _content[tilePosition] = content;
+        _content[tilePosition.GridPosition] = content;
+    }
+    
+    public void SetContentAt(Point gridPosition, TileContent content)
+    {
+        _content[gridPosition] = content;
     }
 
     public IEnumerable<TilePosition> AllTilesPositions()
@@ -120,6 +125,11 @@ public class Tiles : BaseComponent
 
     public TileContent GetContentAt(TilePosition tilePosition)
     {
-        return _content[tilePosition];
+        return _content[tilePosition.GridPosition];
+    }
+    
+    public TileContent GetContentAt(Point gridPosition)
+    {
+        return _content[gridPosition];
     }
 }
