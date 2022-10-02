@@ -56,7 +56,7 @@ public class World
         if (Garden.HasCropAt(position) && Garden.GetCropAt(position).IsReadyToHarvest)
         {
             return new TapAction($"Harvest {Garden.GetCropAt(position).Template.Name}",
-                $"{Garden.GetCropAt(position).Template.CropBehaviors.Harvested.Description()}", position, Color.Green,
+                $"{Garden.GetCropAt(position).Template.CropBehaviors.Harvested.Description()}", position, Color.LightGreen,
                 () =>
                 {
                     var crop = Garden.GetCropAt(position);
@@ -96,7 +96,7 @@ public class World
         if (PlayerStats.Energy.CanAfford(content.UpgradeCost()))
         {
             return new TapAction($"{content.UpgradeVerb} {content.Name}", $"Costs {content.UpgradeCost()} Energy",
-                position, Color.Blue, () =>
+                position, Color.LightBlue, () =>
                 {
                     _farmer.EnqueueGoToTile(position);
                     PlayerStats.Energy.Consume(content.UpgradeCost());
@@ -132,5 +132,5 @@ public record TapError(string Title, string Description) : ITapAction
         LudumCartridge.Ui.ErrorToast.ShowError(Title);
     }
 
-    public Color Color => Color.Red;
+    public Color Color => Color.DarkRed;
 }
