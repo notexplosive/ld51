@@ -92,7 +92,12 @@ public class World
 
         if (content.Upgrade() == content)
         {
-            return new TapError("Fully watered", "Plant something here");
+            if (content.IsWet)
+            {
+                return new TapError("Fully Watered", "Plant something here");
+            }
+
+            return new TapError("Unusable Soil", "Cannot be tilled");
         }
 
         if (PlayerStats.Energy.CanAfford(content.UpgradeCost()))

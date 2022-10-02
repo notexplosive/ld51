@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ExplogineMonoGame;
 using ExplogineMonoGame.HitTesting;
 using ExplogineMonoGame.Input;
 using MachinaLite;
@@ -18,8 +19,20 @@ public class Tiles : BaseComponent
         Dimensions = dimensions;
         foreach (var tilePosition in AllTilesPositions())
         {
-            _content[tilePosition.GridPosition] = TileContent.Dirt;
+            _content[tilePosition.GridPosition] = ChooseRandomSoilContent();
         }
+    }
+
+    private TileContent ChooseRandomSoilContent()
+    {
+        var roll = Client.Random.Clean.NextFloat();
+
+        if (roll < 0.15)
+        {
+            return TileContent.Dirt;
+        }
+
+        return TileContent.Dead;
     }
 
     public Point Dimensions { get; }

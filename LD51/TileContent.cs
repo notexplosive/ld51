@@ -32,6 +32,7 @@ public class TileContent
     public ContentTrait Trait { get; }
     public int Frame { get; }
     public bool IsWet => Trait == ContentTrait.Wet;
+    public bool IsDead => Trait == ContentTrait.Dead;
     public string UpgradeVerb { get; }
 
     public TileContent Upgrade()
