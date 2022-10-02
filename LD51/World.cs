@@ -13,7 +13,6 @@ public class World
         var gardenActor = scene.AddActor("Tiles");
         Tiles = new Tiles(gardenActor, new Point(25));
         new TileRenderer(gardenActor);
-        new SelectedTileRenderer(gardenActor);
         Garden = new Garden(gardenActor, Tiles);
         new GardenRenderer(gardenActor);
         gardenActor.Transform.Depth += 500;
@@ -23,20 +22,21 @@ public class World
         new TextureRenderer(guy, texture, new DrawOrigin(new Vector2(texture.Width / 2f, texture.Height)));
         var farmer = new Farmer(guy, Tiles);
 
+        new SelectedTileRenderer(gardenActor, farmer);
+
         Tiles.TileTapped += position =>
         {
             if (farmer.InputBlocked)
             {
                 return;
             }
-
+            farmer.ClearTween();
+            
             var farmerIsStandingOnTappedTile = farmer.CurrentTile.HasValue && farmer.CurrentTile.Value == position;
 
             if (Garden.HasCropAt(position) && Garden.GetCropAt(position).IsReadyToHarvest)
             {
                 var crop = Garden.GetCropAt(position);
-
-                farmer.ClearTween();
 
                 if (!farmerIsStandingOnTappedTile)
                 {
@@ -54,7 +54,6 @@ public class World
                     LudumCartridge.Ui.Inventory.Remove(LudumCartridge.Ui.Inventory.GrabbedCard);
                     LudumCartridge.Ui.Inventory.ClearGrabbedCard();
 
-                    farmer.ClearTween();
                     if (!farmerIsStandingOnTappedTile)
                     {
                         farmer.EnqueueGoToTile(position);
@@ -70,10 +69,14 @@ public class World
             }
             else
             {
-                if (PlayerStats.Energy.CanAfford(Tiles.GetContentAt(position).UpgradeCost()))
-                {
-                    farmer.ClearTween();
 
+                var content = Tiles.GetContentAt(position);
+                if (content.Upgrade() == content)
+                {
+                    LudumCartridge.Ui.ErrorToast.ShowError("No action to do there");
+                }
+                else if (PlayerStats.Energy.CanAfford(content.UpgradeCost()))
+                {
                     if (!farmerIsStandingOnTappedTile)
                     {
                         LudumCartridge.Ui.Inventory.ClearGrabbedCard();
