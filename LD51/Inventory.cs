@@ -67,12 +67,11 @@ public class Inventory : BaseComponent
     {
         return GrabbedCard != null;
     }
-
-    public void Discard(Card card, DiscardPile discardPile)
+    
+    public void Remove(Card card)
     {
         card.Actor.Destroy();
         _cardsInHand.Remove(card);
-        discardPile.Add(card.CropTemplate);
         ArrangeCards();
     }
 }

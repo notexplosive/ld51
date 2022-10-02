@@ -80,7 +80,27 @@ public class LudumCartridge : MachinaCartridge
         LudumCartridge.World = new World(LudumCartridge.GameScene);
         LudumCartridge.Ui = new Ui(LudumCartridge.UiScene);
 
-        new DebugComponent(LudumCartridge.GameScene.AddActor("dbug"));
+        new DebugComponent(LudumCartridge.GameScene.AddActor("debug"));
+        new Appendix(LudumCartridge.GameScene.AddActor("appendix"));
+    }
+}
+
+public class Appendix : BaseComponent
+{
+    public Appendix(Actor actor) : base(actor)
+    {
+    }
+
+    public override void Update(float dt)
+    {
+        if (Fx.EventTween.IsDone())
+        {
+            Fx.EventTween.Clear();
+        }
+        else
+        {
+            Fx.EventTween.Update(dt);
+        }
     }
 }
 

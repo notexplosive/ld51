@@ -50,8 +50,8 @@ public class World
                 var canPlantHere = tiles.GetContentAt(position).IsWet && garden.IsEmpty(position);
                 if (canPlantHere)
                 {
-                    var crop = LudumCartridge.Ui.Inventory.GrabbedCard.CropTemplate;
-                    LudumCartridge.Ui.Inventory.Discard(LudumCartridge.Ui.Inventory.GrabbedCard, LudumCartridge.Ui.DiscardPile);
+                    var template = LudumCartridge.Ui.Inventory.GrabbedCard.CropTemplate;
+                    LudumCartridge.Ui.Inventory.Remove(LudumCartridge.Ui.Inventory.GrabbedCard);
                     LudumCartridge.Ui.Inventory.ClearGrabbedCard();
 
                     farmer.ClearTween();
@@ -61,7 +61,7 @@ public class World
                         farmer.EnqueueStepOffTile();
                     }
 
-                    farmer.EnqueuePlantCrop(crop, garden, position);
+                    farmer.EnqueuePlantCrop(new CropEventData(position, garden, template, tiles));
                 }
                 else
                 {

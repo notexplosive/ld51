@@ -16,13 +16,15 @@ public class Crop
     private int _level;
     private float _timeAtCurrentLevel;
     private float _totalTime;
+    private readonly CropEventData _data;
 
-    public Crop(Garden garden, CropTemplate template, Tiles tiles, TilePosition position)
+    public Crop(CropEventData data)
     {
-        _garden = garden;
-        _template = template;
-        _tiles = tiles;
-        _position = position;
+        _data = data;
+        _garden = data.Garden;
+        _template = data.Template;
+        _tiles = data.Tiles;
+        _position = data.Position;
     }
 
     public bool IsReadyToHarvest => _level == _template.EffectiveMaxLevel;
@@ -59,11 +61,11 @@ public class Crop
             _tiles.PutTileContentAt(_position, _tiles.GetContentAt(_position).Downgrade());
             _level++;
 
-            Grew?.Invoke(CreateCropEventData());
+            Grew?.Invoke(_data);
 
             if (IsReadyToHarvest)
             {
-                FinishedGrowing?.Invoke(CreateCropEventData());
+                FinishedGrowing?.Invoke(_data);
             }
         }
     }
@@ -77,14 +79,14 @@ public class Crop
     public void Harvest()
     {
         _garden.RemoveCropAt(_position);
-        Harvested?.Invoke(CreateCropEventData());
-    }
+        if (_template.IsRecyclable)
+        {
+            Fx.PutCardInDiscard(_data.Position.Rectangle.Center.ToVector2(), _data.Template);
+        }
 
-    private CropEventData CreateCropEventData()
-    {
-        return new CropEventData(_position, _garden);
+        Harvested?.Invoke(_data);
     }
 }
 
 
-public readonly record struct CropEventData(TilePosition Position, Garden Garden);
+public readonly record struct CropEventData(TilePosition Position, Garden Garden, CropTemplate Template, Tiles Tiles);

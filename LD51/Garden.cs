@@ -13,10 +13,10 @@ public class Garden : BaseComponent
         _tiles = tiles;
     }
 
-    public void PlantCrop(CropTemplate template, TilePosition position)
+    public void PlantCrop(CropEventData data)
     {
-        var crop = template.CreateCrop(this,position, _tiles);
-        _map[position] = crop;
+        var crop = data.Template.CreateCrop(data);
+        _map[data.Position] = crop;
     }
 
     public bool IsEmpty(TilePosition tilePosition)

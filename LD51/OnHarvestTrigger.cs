@@ -21,4 +21,8 @@ public class OnHarvestTrigger : CropTriggers
     public override void OnFinishedGrowing(CropEventData data)
     {
     }
+
+    public override void OnPlanted(CropEventData data)
+    {
+    }
 }
