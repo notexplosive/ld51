@@ -33,7 +33,7 @@ public class Farmer : BaseComponent
         _tweenablePosition = new TweenableVector2(() => Transform.Position, val => Transform.Position = val);
     }
 
-    public TilePosition? CurrentTile { get; set; }
+    public TilePosition CurrentTile { get; set; }
     public bool InputBlocked => !_tween.IsDone();
 
     public override void Draw(Painter painter)
@@ -91,18 +91,16 @@ public class Farmer : BaseComponent
 
     public void EnqueueGoToTile(TilePosition tilePosition)
     {
-        CurrentTile = null;
-
-        Enqueue(WalkTo(tilePosition.Rectangle.Center.ToVector2() - new Vector2(A.TileRect.Width / 2f, 0)));
-        Enqueue(new CallbackTween(() => { CurrentTile = tilePosition; }));
+        if (CurrentTile != tilePosition)
+        {
+            Enqueue(WalkTo(tilePosition.Rectangle.Center.ToVector2() - new Vector2(A.TileRect.Width / 2f, 0)));
+            Enqueue(new CallbackTween(() => { CurrentTile = tilePosition; }));
+        }
     }
 
     public void UpgradeCurrentTile()
     {
-        if (CurrentTile != null)
-        {
-            _tiles.SetContentAt(CurrentTile.Value, _tiles.GetContentAt(CurrentTile.Value).Upgrade());
-        }
+        _tiles.SetContentAt(CurrentTile, _tiles.GetContentAt(CurrentTile).Upgrade());
     }
 
     private void Enqueue(ITween tween)
@@ -122,34 +120,31 @@ public class Farmer : BaseComponent
         {
             var dynamicResult = new SequenceTween();
 
-            if (CurrentTile.HasValue)
+            var tileContent = _tiles.GetContentAt(CurrentTile);
+            if (tileContent == TileContent.Dirt)
             {
-                var tileContent = _tiles.GetContentAt(CurrentTile.Value);
-                if (tileContent == TileContent.Dirt)
-                {
-                    dynamicResult.Add(new CallbackTween(() => _toolAngle.Value = 0f));
-                    dynamicResult.Add(ShowTool(Tool.Hoe));
-                    dynamicResult.Add(new Tween<float>(_toolAngle, -MathF.PI / 2f, 0.25f, Ease.QuadFastSlow));
-                    dynamicResult.Add(new Tween<float>(_toolAngle, MathF.PI / 4f, 0.15f, Ease.QuadSlowFast));
-                    dynamicResult.Add(new WaitSecondsTween(0.15f));
-                    dynamicResult.Add(new Tween<float>(_toolAngle, -MathF.PI / 2f, 0.25f, Ease.QuadFastSlow));
-                    dynamicResult.Add(new Tween<float>(_toolAngle, MathF.PI / 4f, 0.15f, Ease.QuadSlowFast));
-                    dynamicResult.Add(new WaitSecondsTween(0.15f));
-                    dynamicResult.Add(new CallbackTween(UpgradeCurrentTile));
-                    dynamicResult.Add(new WaitSecondsTween(0.1f));
-                }
+                dynamicResult.Add(new CallbackTween(() => _toolAngle.Value = 0f));
+                dynamicResult.Add(ShowTool(Tool.Hoe));
+                dynamicResult.Add(new Tween<float>(_toolAngle, -MathF.PI / 2f, 0.25f, Ease.QuadFastSlow));
+                dynamicResult.Add(new Tween<float>(_toolAngle, MathF.PI / 4f, 0.15f, Ease.QuadSlowFast));
+                dynamicResult.Add(new WaitSecondsTween(0.15f));
+                dynamicResult.Add(new Tween<float>(_toolAngle, -MathF.PI / 2f, 0.25f, Ease.QuadFastSlow));
+                dynamicResult.Add(new Tween<float>(_toolAngle, MathF.PI / 4f, 0.15f, Ease.QuadSlowFast));
+                dynamicResult.Add(new WaitSecondsTween(0.15f));
+                dynamicResult.Add(new CallbackTween(UpgradeCurrentTile));
+                dynamicResult.Add(new WaitSecondsTween(0.1f));
+            }
 
-                if (tileContent == TileContent.Tilled || tileContent.IsWet)
-                {
-                    dynamicResult.Add(ShowTool(Tool.WateringCan));
-                    dynamicResult.Add(new CallbackTween(() => Fx.WaterTile(CurrentTile.Value.GridPosition)));
-                    dynamicResult.Add(new CallbackTween(() => _toolAngle.Value = 0f));
-                    dynamicResult.Add(new Tween<float>(_toolAngle, MathF.PI / 4f, 0.25f, Ease.QuadFastSlow));
-                    dynamicResult.Add(new WaitSecondsTween(0.1f));
-                    dynamicResult.Add(new WaitSecondsTween(0.1f));
-                    dynamicResult.Add(new Tween<float>(_toolAngle, 0, 0.25f, Ease.QuadSlowFast));
-                    dynamicResult.Add(new WaitSecondsTween(0.15f));
-                }
+            if (tileContent == TileContent.Tilled || tileContent.IsWet)
+            {
+                dynamicResult.Add(ShowTool(Tool.WateringCan));
+                dynamicResult.Add(new CallbackTween(() => Fx.WaterTile(CurrentTile.GridPosition)));
+                dynamicResult.Add(new CallbackTween(() => _toolAngle.Value = 0f));
+                dynamicResult.Add(new Tween<float>(_toolAngle, MathF.PI / 4f, 0.25f, Ease.QuadFastSlow));
+                dynamicResult.Add(new WaitSecondsTween(0.1f));
+                dynamicResult.Add(new WaitSecondsTween(0.1f));
+                dynamicResult.Add(new Tween<float>(_toolAngle, 0, 0.25f, Ease.QuadSlowFast));
+                dynamicResult.Add(new WaitSecondsTween(0.15f));
             }
 
             return dynamicResult;

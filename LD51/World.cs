@@ -34,16 +34,11 @@ public class World
             var heldCard = LudumCartridge.Ui.Inventory.GrabbedCard;
             LudumCartridge.Ui.Inventory.ClearGrabbedCard();
             farmer.ClearTween();
-            
-            var farmerIsStandingOnTappedTile = farmer.CurrentTile.HasValue && farmer.CurrentTile.Value == position;
 
             if (Garden.HasCropAt(position) && Garden.GetCropAt(position).IsReadyToHarvest)
             {
                 var crop = Garden.GetCropAt(position);
-                if (!farmerIsStandingOnTappedTile)
-                {
-                    farmer.EnqueueGoToTile(position);
-                }
+                farmer.EnqueueGoToTile(position);
                 farmer.EnqueueHarvestCrop(crop);
             }
             else if (heldCard != null)
@@ -53,12 +48,7 @@ public class World
                 {
                     var template = heldCard.CropTemplate;
                     LudumCartridge.Ui.Inventory.Remove(heldCard);
-
-                    if (!farmerIsStandingOnTappedTile)
-                    {
-                        farmer.EnqueueGoToTile(position);
-                    }
-
+                    farmer.EnqueueGoToTile(position);
                     farmer.EnqueuePlantCrop(new CropEventData(position, Garden, template, Tiles));
                 }
                 else
@@ -75,11 +65,7 @@ public class World
                 }
                 else if (PlayerStats.Energy.CanAfford(content.UpgradeCost()))
                 {
-                    if (!farmerIsStandingOnTappedTile)
-                    {
-                        farmer.EnqueueGoToTile(position);
-                    }
-
+                    farmer.EnqueueGoToTile(position);
                     PlayerStats.Energy.Consume(content.UpgradeCost());
                     farmer.EnqueueUpgradeCurrentTile();
                 }
@@ -90,7 +76,7 @@ public class World
             }
         };
 
-        guy.Transform.Position = new Vector2(500, 500);
+        guy.Transform.Position = new Vector2(Client.Window.RenderResolution.X / 2f, Client.Window.RenderResolution.Y / 2f);
     }
 
     public Tiles Tiles { get; }
