@@ -46,11 +46,7 @@ public class Ui
         {
             if (button == MouseButton.Left && !LudumCartridge.Cutscene.IsPlaying())
             {
-                if (Deck.IsNotEmpty() && PlayerStats.Energy.CanAfford(A.DrawCardCost) && !Inventory.IsFull())
-                {
-                    PlayerStats.Energy.Consume(A.DrawCardCost);
-                    Inventory.AddCard(Deck.NextTemplate());
-                }
+                Inventory.DrawNextCard();
             }
         };
 

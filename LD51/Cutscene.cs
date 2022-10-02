@@ -48,7 +48,6 @@ public class Cutscene
             Tween.Add(new CallbackTween(()=>Fx.PutCardInDiscard(LudumCartridge.World.GetFarmerPosition(), CropTemplate.Potato)));
             Tween.Add(new WaitSecondsTween(2f));
         }
-
         
         Tween.Add(new CallbackTween(()=>Fx.GainEnergy(LudumCartridge.World.GetFarmerPosition(), 25)));
         Tween.Add(new WaitSecondsTween(1f));
@@ -129,7 +128,7 @@ public class Cutscene
 
                     for (var i = 0; i < 4; i++)
                     {
-                        Tween.Add(new CallbackTween(() => ui.Inventory.AddCard(ui.Deck.NextTemplate())));
+                        Tween.Add(new CallbackTween(() => ui.Inventory.DrawNextCard(true)));
                         Tween.Add(new WaitSecondsTween(0.15f));
                     }
                 })

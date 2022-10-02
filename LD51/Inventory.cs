@@ -19,7 +19,8 @@ public class Inventory : BaseComponent
     public Card GrabbedCard { get; private set; }
     public int Count => _cardsInHand.Count;
 
-    public override void OnMouseButton(MouseButton button, Vector2 currentPosition, ButtonState state, HitTestStack hitTestStack)
+    public override void OnMouseButton(MouseButton button, Vector2 currentPosition, ButtonState state,
+        HitTestStack hitTestStack)
     {
         if (button == MouseButton.Right && state == ButtonState.Pressed && !LudumCartridge.Cutscene.IsPlaying())
         {
@@ -64,7 +65,26 @@ public class Inventory : BaseComponent
                 case Keys.D6:
                     TryGrab(5);
                     break;
+                case Keys.Tab:
+                    DrawNextCard();
+                    break;
             }
+        }
+    }
+
+    public void DrawNextCard(bool skipCost = false)
+    {
+        var cost = A.DrawCardCost;
+        var canAfford = PlayerStats.Energy.CanAfford(cost) || skipCost;
+
+        if (!IsFull() && LudumCartridge.Ui.Deck.IsNotEmpty() && canAfford)
+        {
+            if (!skipCost)
+            {
+                PlayerStats.Energy.Consume(cost);
+            }
+
+            AddCard(LudumCartridge.Ui.Deck.NextTemplate());
         }
     }
 
@@ -128,7 +148,7 @@ public class Inventory : BaseComponent
     {
         return _cardsInHand.Count >= 6;
     }
-    
+
     public bool IsEmpty()
     {
         return _cardsInHand.Count == 0;
