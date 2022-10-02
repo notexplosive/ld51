@@ -83,6 +83,7 @@ public class World
                         farmer.EnqueueGoToTile(position);
                     }
 
+                    PlayerStats.Energy.Consume(content.UpgradeCost());
                     farmer.EnqueueUpgradeCurrentTile();
                 }
                 else

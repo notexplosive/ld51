@@ -136,7 +136,6 @@ public class Farmer : BaseComponent
                     dynamicResult.Add(new Tween<float>(_toolAngle, MathF.PI / 4f, 0.15f, Ease.QuadSlowFast));
                     dynamicResult.Add(new WaitSecondsTween(0.15f));
                     dynamicResult.Add(new CallbackTween(UpgradeCurrentTile));
-                    dynamicResult.Add(new CallbackTween(() => { PlayerStats.Energy.Consume(A.TillCost); }));
                     dynamicResult.Add(new WaitSecondsTween(0.1f));
                 }
 
@@ -149,7 +148,6 @@ public class Farmer : BaseComponent
                     dynamicResult.Add(new WaitSecondsTween(0.1f));
                     dynamicResult.Add(new WaitSecondsTween(0.1f));
                     dynamicResult.Add(new Tween<float>(_toolAngle, 0, 0.25f, Ease.QuadSlowFast));
-                    dynamicResult.Add(new CallbackTween(() => { PlayerStats.Energy.Consume(A.WaterCost); }));
                     dynamicResult.Add(new WaitSecondsTween(0.15f));
                 }
             }
