@@ -37,7 +37,6 @@ public class World
             var heldCard = LudumCartridge.Ui.Inventory.GrabbedCard;
             LudumCartridge.Ui.Inventory.ClearGrabbedCard();
             _farmer.ClearTween();
-
             GetTapAction(position, heldCard).Execute();
         };
 
