@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using ExplogineMonoGame;
-using ExplogineMonoGame.Data;
 using ExplogineMonoGame.HitTesting;
 using ExplogineMonoGame.Input;
 using MachinaLite;
@@ -13,7 +11,7 @@ public class Tiles : BaseComponent
 {
     public delegate void TileEvent(TilePosition tilePosition);
 
-    private Dictionary<TilePosition, TileContent> _content = new();
+    private readonly Dictionary<TilePosition, TileContent> _content = new();
 
     public Tiles(Actor actor, Point dimensions) : base(actor)
     {
@@ -61,7 +59,28 @@ public class Tiles : BaseComponent
     {
         HoveredTile = tilePosition;
         var content = GetContentAt(tilePosition);
-        LudumCartridge.Ui.Tooltip.Set($"{content.UpgradeVerb} {content.Name}", $"Costs {content.UpgradeCost()} Energy");
+
+        var description = $"Costs {content.UpgradeCost()} Energy";
+        var skip = false;
+
+        if (LudumCartridge.World.Garden.HasCropAt(tilePosition))
+        {
+            var crop = LudumCartridge.World.Garden.GetCropAt(tilePosition);
+
+            description +=
+                $"\n{crop.Template.Name} {crop.Level + 1} / {crop.Template.EffectiveMaxLevel + 1}";
+
+            if (crop.IsReadyToHarvest)
+            {
+                LudumCartridge.Ui.Tooltip.Set($"Harvest {crop.Template.Name}", "Harvest it!");
+                skip = true;
+            }
+        }
+
+        if (!skip)
+        {
+            LudumCartridge.Ui.Tooltip.Set($"{content.UpgradeVerb} {content.Name}", description);
+        }
     }
 
     public void PutTileContentAt(TilePosition tilePosition, TileContent content)

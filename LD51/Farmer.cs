@@ -100,7 +100,7 @@ public class Farmer : BaseComponent
             Enqueue(HaltInput());
         }
         
-        Enqueue(WalkTo(tilePosition.Rectangle.Center.ToVector2()));
+        Enqueue(WalkTo(tilePosition.Rectangle.Center.ToVector2() - new Vector2(A.TileRect.Width / 2f, 0)));
         Enqueue(new CallbackTween(() => { CurrentTile = tilePosition; }));
         
         if (blockInput)
@@ -115,27 +115,6 @@ public class Farmer : BaseComponent
         {
             _tiles.PutTileContentAt(CurrentTile.Value, _tiles.GetContentAt(CurrentTile.Value).Upgrade());
         }
-    }
-
-    private ITween StepOffTile()
-    {
-        var result = new SequenceTween();
-        result.Add(HaltInput());
-        result.Add(
-            new DynamicTween(() =>
-            {
-                if (CurrentTile.HasValue)
-                {
-                    return WalkTo(
-                        CurrentTile.Value.Rectangle.Center.ToVector2() - new Vector2(A.TileRect.Width / 2f, 0));
-                }
-
-                return new SequenceTween();
-            })
-        );
-        result.Add(new WaitSecondsTween(0.15f));
-        result.Add(RestoreInput());
-        return result;
     }
 
     private void Enqueue(ITween tween)
@@ -162,7 +141,6 @@ public class Farmer : BaseComponent
     {
         var result = new SequenceTween();
         result.Add(HaltInput());
-        result.Add(StepOffTile());
         result.Add(new DynamicTween(() =>
         {
             var dynamicResult = new SequenceTween();
@@ -214,19 +192,12 @@ public class Farmer : BaseComponent
 
     public void EnqueuePlantCrop(CropEventData data)
     {
-        Enqueue(StepOffTile());
         Enqueue(new CallbackTween(() => data.Garden.PlantCrop(data)));
-    }
-
-    public void EnqueueStepOffTile()
-    {
-        Enqueue(StepOffTile());
     }
 
     public void EnqueueHarvestCrop(Crop crop)
     {
         Enqueue(HaltInput());
-        Enqueue(StepOffTile());
         Enqueue(new WaitSecondsTween(0.25f));
         Enqueue(new CallbackTween(()=>crop.Harvest()));
         Enqueue(RestoreInput());

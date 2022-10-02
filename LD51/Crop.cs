@@ -11,9 +11,10 @@ public class Crop
 {
     private readonly TilePosition _position;
     private readonly Garden _garden;
-    private readonly CropTemplate _template;
+    public CropTemplate Template { get; }
     private readonly Tiles _tiles;
-    private int _level;
+    public int CurrentFrameOffset { get; private set; }
+    public int Level => CurrentFrameOffset;
     private float _timeAtCurrentLevel;
     private float _totalTime;
     private readonly CropEventData _data;
@@ -22,16 +23,16 @@ public class Crop
     {
         _data = data;
         _garden = data.Garden;
-        _template = data.Template;
+        Template = data.Template;
         _tiles = data.Tiles;
         _position = data.Position;
     }
 
-    public bool IsReadyToHarvest => _level == _template.EffectiveMaxLevel;
+    public bool IsReadyToHarvest => CurrentFrameOffset == Template.EffectiveMaxLevel;
 
     public void Draw(Painter painter, Vector2 renderPos, Depth depth)
     {
-        Client.Assets.GetAsset<SpriteSheet>("Plants").DrawFrame(painter, _template.CropGraphic.FirstFrame + _level,
+        Client.Assets.GetAsset<SpriteSheet>("Plants").DrawFrame(painter, Template.CropGraphic.FirstFrame + CurrentFrameOffset,
             renderPos, Scale2D.One,
             new DrawSettings
                 {Color = Color.White, Depth = depth, Origin = DrawOrigin.Center, Angle = MathF.Sin(_totalTime) / 8f});
@@ -49,7 +50,7 @@ public class Crop
             _timeAtCurrentLevel += dt;
         }
 
-        if (_timeAtCurrentLevel > _template.TickLength)
+        if (_timeAtCurrentLevel > Template.TickLength)
         {
             Grow();
         }
@@ -59,10 +60,10 @@ public class Crop
     {
         _timeAtCurrentLevel = 0;
 
-        if (_level < _template.EffectiveMaxLevel)
+        if (CurrentFrameOffset < Template.EffectiveMaxLevel)
         {
             _tiles.PutTileContentAt(_position, _tiles.GetContentAt(_position).Downgrade());
-            _level++;
+            CurrentFrameOffset++;
 
             Grew?.Invoke(_data);
 
@@ -82,7 +83,7 @@ public class Crop
     public void Harvest()
     {
         _garden.RemoveCropAt(_position);
-        if (_template.IsRecyclable)
+        if (Template.IsRecyclable)
         {
             Fx.PutCardInDiscard(_data.Position.Rectangle.Center.ToVector2(), _data.Template);
         }

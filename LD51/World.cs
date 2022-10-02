@@ -14,7 +14,7 @@ public class World
         var tiles = new Tiles(gardenActor, new Point(25));
         new TileRenderer(gardenActor);
         new SelectedTileRenderer(gardenActor);
-        var garden = new Garden(gardenActor, tiles);
+        Garden = new Garden(gardenActor, tiles);
         new GardenRenderer(gardenActor);
         gardenActor.Transform.Depth += 500;
 
@@ -32,9 +32,9 @@ public class World
 
             var farmerIsStandingOnTappedTile = farmer.CurrentTile.HasValue && farmer.CurrentTile.Value == position;
 
-            if (garden.HasCropAt(position) && garden.GetCropAt(position).IsReadyToHarvest)
+            if (Garden.HasCropAt(position) && Garden.GetCropAt(position).IsReadyToHarvest)
             {
-                var crop = garden.GetCropAt(position);
+                var crop = Garden.GetCropAt(position);
 
                 farmer.ClearTween();
 
@@ -47,7 +47,7 @@ public class World
             }
             else if (LudumCartridge.Ui.Inventory.HasGrabbedCard())
             {
-                var canPlantHere = tiles.GetContentAt(position).IsWet && garden.IsEmpty(position);
+                var canPlantHere = tiles.GetContentAt(position).IsWet && Garden.IsEmpty(position);
                 if (canPlantHere)
                 {
                     var template = LudumCartridge.Ui.Inventory.GrabbedCard.CropTemplate;
@@ -58,10 +58,9 @@ public class World
                     if (!farmerIsStandingOnTappedTile)
                     {
                         farmer.EnqueueGoToTile(position, true);
-                        farmer.EnqueueStepOffTile();
                     }
 
-                    farmer.EnqueuePlantCrop(new CropEventData(position, garden, template, tiles));
+                    farmer.EnqueuePlantCrop(new CropEventData(position, Garden, template, tiles));
                 }
                 else
                 {
@@ -84,6 +83,8 @@ public class World
 
         guy.Transform.Position = new Vector2(500, 500);
     }
+
+    public Garden Garden { get; }
 
     public Scene Scene { get; }
 }
