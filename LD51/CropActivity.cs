@@ -35,4 +35,13 @@ public record CropActivity(string Description, CropEvent Behavior)
             }
         });
     }
+
+    public static CropActivity Recycle()
+    {
+        return new CropActivity("Recycle back into Discard",
+            data =>
+        {
+            Fx.PutCardInDiscard(data.Position.Rectangle.Center.ToVector2(), data.Template); 
+        });
+    }
 }

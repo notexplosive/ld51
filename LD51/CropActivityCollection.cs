@@ -1,41 +1,32 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 
 namespace LD51;
 
 public class CropActivityCollection
 {
-    private List<CropActivity> _activities = new();
     private readonly string _verb;
+    private readonly List<CropActivity> _activities = new();
 
     public CropActivityCollection(string verb)
     {
         _verb = verb;
     }
-    
+
     public string Description()
     {
         if (_activities.Count == 0)
         {
             return "";
         }
-        
-        var stringBuilder = new StringBuilder();
 
-        stringBuilder.Append($"On {_verb}: ");
+        var descriptions = new List<string>();
 
-        for (var index = 0; index < _activities.Count; index++)
+        foreach (var item in _activities)
         {
-            var item = _activities[index];
-            if (index > 0 && index != _activities.Count -1)
-            {
-                stringBuilder.Append(", ");
-            }
-
-            stringBuilder.Append(item.Description);
+            descriptions.Add(item.Description);
         }
 
-        return stringBuilder.ToString();
+        return $"On {_verb}: {string.Join(" and ", descriptions)}";
     }
 
     public void Add(CropActivity activity)

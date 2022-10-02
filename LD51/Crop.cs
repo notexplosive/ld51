@@ -83,11 +83,6 @@ public class Crop
     public void Harvest()
     {
         _garden.RemoveCropAt(_position);
-        if (Template.IsRecyclable)
-        {
-            Fx.PutCardInDiscard(_data.Position.Rectangle.Center.ToVector2(), _data.Template);
-        }
-
         Harvested?.Invoke(_data);
     }
 }
