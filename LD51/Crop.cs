@@ -91,7 +91,7 @@ public class Crop
 
         if (CurrentFrameOffset < Template.EffectiveMaxLevel)
         {
-            _tiles.SetContentAt(_position, _tiles.GetContentAt(_position).Downgrade());
+            _tiles.SetContentAt(_position, _tiles.GetContentAt(_position).Drain());
             CurrentFrameOffset++;
 
             Grew?.Invoke(_data);

@@ -48,4 +48,9 @@ public class Garden : BaseComponent
     {
         _map.Remove(position);
     }
+
+    public void KillAllCrops()
+    {
+        _map.Clear();
+    }
 }

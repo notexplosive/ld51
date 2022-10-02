@@ -17,6 +17,11 @@ public class Tiles : BaseComponent
     public Tiles(Actor actor, Point dimensions) : base(actor)
     {
         Dimensions = dimensions;
+        RandomizeContent();
+    }
+
+    public void RandomizeContent()
+    {
         foreach (var tilePosition in AllTilesPositions())
         {
             _content[tilePosition.GridPosition] = ChooseRandomSoilContent();
@@ -147,5 +152,14 @@ public class Tiles : BaseComponent
     public Rectangle GetRectangleAt(Point gridPosition)
     {
         return GridPosToRectangle(gridPosition);
+    }
+
+    public void DrainAllSoil()
+    {
+        foreach (var tile in AllTilesPositions())
+        {
+            var content = GetContentAt(tile);
+            SetContentAt(tile,content.Drain());
+        }
     }
 }

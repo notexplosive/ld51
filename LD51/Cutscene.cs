@@ -40,18 +40,31 @@ public class Cutscene
     public void PlayReshuffle()
     {
         var ui = LudumCartridge.Ui;
+        var world = LudumCartridge.World;
 
         Tween.Add(new CallbackTween(() => ui.Inventory.ClearGrabbedCard()));
 
+        Tween.Add(new CallbackTween(() => Fx.GainEnergy(world.GetFarmerPosition(), 25)));
+
         for (var i = 0; i < 1; i++)
         {
-            Tween.Add(new CallbackTween(()=>Fx.PutCardInDiscard(LudumCartridge.World.GetFarmerPosition(), CropTemplate.Potato)));
+            Tween.Add(new CallbackTween(() => Fx.PutCardInDiscard(world.GetFarmerPosition(), CropTemplate.Potato)));
             Tween.Add(new WaitSecondsTween(2f));
         }
-        
-        Tween.Add(new CallbackTween(()=>Fx.GainEnergy(LudumCartridge.World.GetFarmerPosition(), 25)));
+
+        Tween.Add(new CallbackTween(() => world.Garden.KillAllCrops()));
+
+        Tween.Add(new WaitSecondsTween(0.25f));
+        Tween.Add(new CallbackTween(() => world.Tiles.DrainAllSoil()));
+        Tween.Add(new WaitSecondsTween(0.25f));
+        Tween.Add(new CallbackTween(() => world.Tiles.DrainAllSoil()));
+        Tween.Add(new WaitSecondsTween(0.25f));
+        Tween.Add(new CallbackTween(() => world.Tiles.DrainAllSoil()));
+        Tween.Add(new WaitSecondsTween(0.25f));
+        Tween.Add(new CallbackTween(() => world.Tiles.DrainAllSoil()));
+
         Tween.Add(new WaitSecondsTween(1f));
-        
+
         for (var i = 0; i < ui.Inventory.Count; i++)
         {
             Tween.Add(new CallbackTween(() =>
@@ -79,6 +92,7 @@ public class Cutscene
         Tween.Add(new WaitSecondsTween(1));
 
         Tween.Add(new Tween<float>(_faderOpacity, 1f, 0.5f, Ease.Linear));
+        Tween.Add(new CallbackTween(() => world.Tiles.RandomizeContent()));
 
         var startPosition = new Vector2(Client.Window.RenderResolution.X / 2f, Client.Window.RenderResolution.Y + 200);
         _deckPosition.Value = startPosition;
@@ -102,10 +116,13 @@ public class Cutscene
 
                     Tween.Add(new CallbackTween(() => _deck.NumberOfCards = numberOfCardsInDiscard));
 
+                    var totalDuration = 1f;
+                    var durationPerCard = totalDuration / numberOfCardsInDiscard;
+
                     for (var i = 0; i < numberOfCardsInDiscard; i++)
                     {
                         Tween.Add(_deck.ShootCard(indices[i]));
-                        Tween.Add(new WaitSecondsTween(0.15f));
+                        Tween.Add(new WaitSecondsTween(durationPerCard));
                     }
 
                     Tween.Add(new WaitSecondsTween(0.5f));
@@ -115,7 +132,7 @@ public class Cutscene
                     for (var i = 0; i < numberOfCardsInDiscard; i++)
                     {
                         Tween.Add(_deck.PullCardIn(indices[i]));
-                        Tween.Add(new WaitSecondsTween(0.15f));
+                        Tween.Add(new WaitSecondsTween(durationPerCard));
                     }
 
                     Tween.Add(new CallbackTween(() => ui.DiscardPile.Reshuffle()));

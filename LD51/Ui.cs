@@ -93,7 +93,7 @@ public class Ui
                 LudumCartridge.Cutscene.PlayReshuffle();
             }
         };
-        new TooltipOwner(reshuffleButtonActor, "Reshuffle", "Go to sleep for a few years.\nReshuffle your deck and gain some energy\nGain a few Common Seeds for free\nAll your crops will die and some soil will decay.");
+        new TooltipOwner(reshuffleButtonActor, "Reshuffle", "Go to sleep for a few years.\nReshuffle your deck and gain some energy.\nChance to gain a free Common Seeds.\nAll your crops will die soil will decay.");
 
         var inventoryBackground = inventoryActor.Transform.AddActorAsChild("Background");
         inventoryBackground.Transform.LocalPosition += new Vector2(0, 32);

@@ -16,7 +16,6 @@ public class TileContent
     public static readonly TileContent WateredL2 = new(5, ContentTrait.Wet, "Water", "Wet Soil (2)");
     public static readonly TileContent WateredL1 = new(6, ContentTrait.Wet, "Water", "Wet Soil (1)");
     public static readonly TileContent Dead = new(2, ContentTrait.Dead, "Revive", "Dead Soil");
-    public static readonly TileContent Dying = new(1, ContentTrait.Dead, "Revive", "Dead Soil");
 
     private TileContent(int frame, ContentTrait trait, string upgradeVerb, string name)
     {
@@ -50,7 +49,7 @@ public class TileContent
         return this;
     }
 
-    public TileContent Downgrade()
+    public TileContent Drain()
     {
         if (this == TileContent.WateredL3)
         {
@@ -65,6 +64,11 @@ public class TileContent
         if (this == TileContent.WateredL1)
         {
             return TileContent.Tilled;
+        }
+        
+        if (this == TileContent.Tilled)
+        {
+            return TileContent.Dirt;
         }
 
         return this;
