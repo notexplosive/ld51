@@ -57,7 +57,7 @@ public class World
                     farmer.ClearTween();
                     if (!farmerIsStandingOnTappedTile)
                     {
-                        farmer.EnqueueGoToTile(position, true);
+                        farmer.EnqueueGoToTile(position);
                     }
 
                     farmer.EnqueuePlantCrop(new CropEventData(position, Garden, template, Tiles));

@@ -23,7 +23,6 @@ public class Farmer : BaseComponent
     private readonly TweenableFloat _toolAngle = new(0);
     private readonly SequenceTween _tween = new();
     private readonly TweenableVector2 _tweenablePosition;
-    private int _blockingFlags;
     private Tool _currentShownTool;
     private bool _isWalking;
     private float _totalWalkTime;
@@ -35,7 +34,7 @@ public class Farmer : BaseComponent
     }
 
     public TilePosition? CurrentTile { get; set; }
-    public bool InputBlocked => _blockingFlags > 0;
+    public bool InputBlocked => !_tween.IsDone();
 
     public override void Draw(Painter painter)
     {
@@ -67,7 +66,6 @@ public class Farmer : BaseComponent
 
     public void ClearTween()
     {
-        _blockingFlags = 0;
         _currentShownTool = Tool.None;
         _isWalking = false;
         _tween.Clear();
@@ -91,22 +89,12 @@ public class Farmer : BaseComponent
             ;
     }
 
-    public void EnqueueGoToTile(TilePosition tilePosition, bool blockInput = false)
+    public void EnqueueGoToTile(TilePosition tilePosition)
     {
         CurrentTile = null;
 
-        if (blockInput)
-        {
-            Enqueue(HaltInput());
-        }
-
         Enqueue(WalkTo(tilePosition.Rectangle.Center.ToVector2() - new Vector2(A.TileRect.Width / 2f, 0)));
         Enqueue(new CallbackTween(() => { CurrentTile = tilePosition; }));
-
-        if (blockInput)
-        {
-            Enqueue(RestoreInput());
-        }
     }
 
     public void UpgradeCurrentTile()
@@ -122,16 +110,6 @@ public class Farmer : BaseComponent
         _tween.Add(tween);
     }
 
-    private ITween RestoreInput()
-    {
-        return new CallbackTween(() => _blockingFlags--);
-    }
-
-    private ITween HaltInput()
-    {
-        return new CallbackTween(() => _blockingFlags++);
-    }
-
     public void EnqueueUpgradeCurrentTile()
     {
         Enqueue(UpgradeCurrentTileTween());
@@ -140,7 +118,6 @@ public class Farmer : BaseComponent
     private ITween UpgradeCurrentTileTween()
     {
         var result = new SequenceTween();
-        result.Add(HaltInput());
         result.Add(new DynamicTween(() =>
         {
             var dynamicResult = new SequenceTween();
@@ -181,7 +158,6 @@ public class Farmer : BaseComponent
         }));
 
         result.Add(HideTool());
-        result.Add(RestoreInput());
 
         return result;
     }
@@ -203,9 +179,7 @@ public class Farmer : BaseComponent
 
     public void EnqueueHarvestCrop(Crop crop)
     {
-        Enqueue(HaltInput());
         Enqueue(new WaitSecondsTween(0.25f));
         Enqueue(new CallbackTween(() => crop.Harvest()));
-        Enqueue(RestoreInput());
     }
 }
