@@ -30,6 +30,9 @@ public class World
             {
                 return;
             }
+
+            var heldCard = LudumCartridge.Ui.Inventory.GrabbedCard;
+            LudumCartridge.Ui.Inventory.ClearGrabbedCard();
             farmer.ClearTween();
             
             var farmerIsStandingOnTappedTile = farmer.CurrentTile.HasValue && farmer.CurrentTile.Value == position;
@@ -37,22 +40,19 @@ public class World
             if (Garden.HasCropAt(position) && Garden.GetCropAt(position).IsReadyToHarvest)
             {
                 var crop = Garden.GetCropAt(position);
-
                 if (!farmerIsStandingOnTappedTile)
                 {
                     farmer.EnqueueGoToTile(position);
                 }
-
                 farmer.EnqueueHarvestCrop(crop);
             }
-            else if (LudumCartridge.Ui.Inventory.HasGrabbedCard())
+            else if (heldCard != null)
             {
                 var canPlantHere = Tiles.GetContentAt(position).IsWet && Garden.IsEmpty(position);
                 if (canPlantHere)
                 {
-                    var template = LudumCartridge.Ui.Inventory.GrabbedCard.CropTemplate;
-                    LudumCartridge.Ui.Inventory.Remove(LudumCartridge.Ui.Inventory.GrabbedCard);
-                    LudumCartridge.Ui.Inventory.ClearGrabbedCard();
+                    var template = heldCard.CropTemplate;
+                    LudumCartridge.Ui.Inventory.Remove(heldCard);
 
                     if (!farmerIsStandingOnTappedTile)
                     {
@@ -64,12 +64,10 @@ public class World
                 else
                 {
                     LudumCartridge.Ui.ErrorToast.ShowError("Cannot plant there");
-                    LudumCartridge.Ui.Inventory.ClearGrabbedCard();
                 }
             }
             else
             {
-
                 var content = Tiles.GetContentAt(position);
                 if (content.Upgrade() == content)
                 {
@@ -79,7 +77,6 @@ public class World
                 {
                     if (!farmerIsStandingOnTappedTile)
                     {
-                        LudumCartridge.Ui.Inventory.ClearGrabbedCard();
                         farmer.EnqueueGoToTile(position);
                     }
 
