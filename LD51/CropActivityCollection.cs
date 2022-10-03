@@ -39,7 +39,7 @@ public class CropActivityCollection
             descriptions.Add(item.Description);
         }
 
-        return $"On {_verb}: {string.Join(" and ", descriptions)}";
+        return $"{_verb}: {string.Join(" and ", descriptions)}";
     }
 
     public void Add(CropActivity activity)
@@ -47,11 +47,11 @@ public class CropActivityCollection
         _activities.Add(activity);
     }
 
-    public void Run(CropEventData data)
+    public void Run(CropEventData self, CropEventData other)
     {
         foreach (var item in _activities)
         {
-            item.Behavior(data);
+            item.Behavior(self, other);
         }
     }
 }

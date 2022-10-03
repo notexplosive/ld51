@@ -87,7 +87,7 @@ public class Cutscene
         {
             Tween.Add(new CallbackTween(() =>
                 Fx.PutCardInDiscard(Fx.UiSpaceToGameSpace(ui.ReshuffleButtonBox.Rectangle.Center.ToVector2()),
-                    CropTemplate.GetRandomOfRarity(Rarity.Common))));
+                    CropTemplate.GetRandomOfRarity(Rarity.Common, CropTemplate.GetByName("Collard")))));
         }
 
         Tween.Add(new WaitSecondsTween(1f));

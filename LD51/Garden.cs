@@ -32,6 +32,16 @@ public class Garden : BaseComponent
         return _map.Keys;
     }
 
+    public Crop TryGetCropAt(Point position)
+    {
+        if (_map.TryGetValue(position, out var result))
+        {
+            return result;
+        }
+
+        return null;
+    }
+    
     public Crop GetCropAt(TilePosition position)
     {
         return _map[position.GridPosition];

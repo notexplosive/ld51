@@ -43,12 +43,8 @@ public record CropTemplate(string Name, ICropGrowCondition GrowCondition, Rarity
     public Crop CreateCrop(CropEventData data)
     {
         var crop = new Crop(data);
-
-        crop.Harvested += CropBehaviors.Harvested.Run;
-        crop.Grew += CropBehaviors.Grow.Run;
-        crop.FinishedGrowing += CropBehaviors.FinishedGrow.Run;
-
-        CropBehaviors.Planted.Run(data);
+        
+        crop.Plant();
 
         return crop;
     }
@@ -88,6 +84,7 @@ public record CropTemplate(string Name, ICropGrowCondition GrowCondition, Rarity
             new CropBehaviors()
                 .WhenHarvested(CropActivity.GainEnergy(20))
                 .WhenHarvested(CropActivity.Recycle())
+                .WhenPlantedAdjacent(CropActivity.GainEnergy(5))
         );
         
         yield return new CropTemplate(
@@ -108,7 +105,6 @@ public record CropTemplate(string Name, ICropGrowCondition GrowCondition, Rarity
             new CropGraphic(2, 20),
             new CropBehaviors()
                 .WhenHarvested(CropActivity.GainEnergy(50))
-                .WhenHarvested(CropActivity.Recycle())
         );
         
         // RESEARCH
@@ -214,11 +210,13 @@ public record CropTemplate(string Name, ICropGrowCondition GrowCondition, Rarity
         
         yield return new CropTemplate(
             "Pumpkin",
-            new GrowOverTime(10), // todo
+            new GrowOverTime(10000), // todo
             Rarity.Legendary,
-            new CropGraphic(3, 34),
+            new CropGraphic(6, 34),
             new CropBehaviors()
                 .WhenHarvested(CropActivity.WinGame())
+                .WhenPlantedAdjacent(CropActivity.GrowSelf())
+                .WhenPlantedAdjacent(CropActivity.DestroyOther())
         );
         
         // yield return new CropTemplate(

@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace LD51;
 
-public delegate void CropEvent(CropEventData data);
+public delegate void CropEvent(CropEventData dataA, CropEventData dataB);
 
 public class Crop
 {
@@ -79,11 +79,11 @@ public class Crop
             _tiles.SetContentAt(_position, _tiles.GetContentAt(_position).Drain());
             CurrentFrameOffset++;
 
-            Grew?.Invoke(_data);
+            Template.CropBehaviors.Grow.Run(_data, _data);
 
             if (IsReadyToHarvest)
             {
-                FinishedGrowing?.Invoke(_data);
+                Template.CropBehaviors.FinishedGrow.Run(_data, _data);
                 Client.SoundPlayer.Play("tag2", new SoundEffectOptions());
             }
             else
@@ -117,10 +117,6 @@ public class Crop
             ;
     }
 
-    public event CropEvent Grew;
-    public event CropEvent FinishedGrowing;
-    public event CropEvent Harvested;
-
     public void Harvest(bool skipRemove = false)
     {
         if (!skipRemove)
@@ -129,13 +125,31 @@ public class Crop
             Client.SoundPlayer.Play("brush", new SoundEffectOptions());
         }
         
-
-        Harvested?.Invoke(_data);
+        Template.CropBehaviors.Harvested.Run(_data, _data);
     }
 
     public string ReportProgress()
     {
         return !IsReadyToHarvest ? Template.GrowCondition.Progress(_timeAtCurrentLevel) : "";
+    }
+
+    public void Plant()
+    {
+        Template.CropBehaviors.Planted.Run(_data, _data);
+
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                if (x == 0 && y == 0)
+                {
+                    continue;
+                }
+                
+                var other = _data.Garden.TryGetCropAt(_data.Position.GridPosition + new Point(x,y));
+                other?.Template.CropBehaviors.PlantedAdjacent.Run(other._data,_data);
+            }
+        }
     }
 }
 

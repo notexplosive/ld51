@@ -162,8 +162,8 @@ public class LudumCartridge : MachinaCartridge
             () =>
             {
                 tutorial.Clear();
-                world.Tiles.SetContentAt(new Point(10, 5), TileContent.Dirt);
-                world.Tiles.SetContentAt(new Point(14, 5), TileContent.Dirt);
+                world.Tiles.SetContentAt(new Point(11, 5), TileContent.Dirt);
+                world.Tiles.SetContentAt(new Point(13, 5), TileContent.Dirt);
             });
 
         tutorial.AddTrigger(
@@ -253,10 +253,11 @@ public class DebugComponent : BaseComponent
 
     public override void OnKey(Keys key, ButtonState state, ModifierKeys modifiers)
     {
-        if (Client.Debug.IsPassiveOrActive)
+        if (Client.Debug.IsPassiveOrActive && state == ButtonState.Pressed)
         {
-            if (key == Keys.A)
+            if (key == Keys.W)
             {
+                LudumCartridge.Ui.Inventory.AddCard(CropTemplate.GetByName("Pumpkin"));
             }
         }
     }
