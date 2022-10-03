@@ -14,8 +14,8 @@ public class Cutscene
     private readonly CutsceneDeck _deck;
     private readonly TweenableVector2 _deckPosition = new(Vector2.Zero);
     private readonly TweenableFloat _faderOpacity = new(0f);
-    private string _text;
     private readonly Tweenable<float> _textOpacity = new TweenableFloat(0f);
+    private string _text;
 
     public Cutscene(Scene scene)
     {
@@ -165,28 +165,39 @@ public class Cutscene
         );
     }
 
-    public void PlayOpening()
+    private void EnqueueShowMessage(string message, float lingerDuration = 2f)
     {
-        _faderOpacity.Value = 1f;
+        Tween.Add(new CallbackTween(() => _text = message));
+        Tween.Add(new Tween<float>(_textOpacity, 1f, 0.5f, Ease.Linear));
 
-        void EnqueueShowMessage(string message, float lingerDuration = 2f)
+        if (lingerDuration > 0)
         {
-            Tween.Add(new CallbackTween(() => _text = message));
-            Tween.Add(new Tween<float>(_textOpacity, 1f, 0.5f, Ease.Linear));
             Tween.Add(new WaitSecondsTween(lingerDuration));
             Tween.Add(new Tween<float>(_textOpacity, 0f, 0.5f, Ease.Linear));
             Tween.Add(new CallbackTween(() => _text = ""));
         }
+    }
+
+    public void PlayOpening()
+    {
+        _faderOpacity.Value = 1f;
 
         EnqueueShowMessage("Somewhere in the wasteland, 100 years after the Calamity...");
         EnqueueShowMessage("A Golem awakens, it's mission carved into its mind.");
-        
+
         Tween.Add(new Tween<float>(_faderOpacity, 0f, 1f, Ease.Linear));
-        
-        EnqueueShowMessage("\"Restore this forgotten wasteland\"", 2);
+
+        EnqueueShowMessage("\"Restore this forgotten wasteland\"");
     }
 
     public void End()
     {
+        Tween.Add(new Tween<float>(_faderOpacity, 1f, 1f, Ease.Linear));
+
+        EnqueueShowMessage("The Golem brings life to another.");
+        EnqueueShowMessage("Together they farm the wasteland.");
+        EnqueueShowMessage("Creating more Golems and lush greenery.");
+        EnqueueShowMessage("Perhaps there is hope for this world...");
+        EnqueueShowMessage("The End - Thanks for playing!", -1);
     }
 }
