@@ -13,7 +13,7 @@ public enum Rarity
     Legendary
 }
 
-public record CropTemplate(string Name, int TickLength, Rarity Rarity,
+public record CropTemplate(string Name, ICropGrowCondition GrowCondition, Rarity Rarity,
     CropGraphic CropGraphic, CropBehaviors CropBehaviors)
 {
     public int EffectiveMaxLevel => CropGraphic.NumberOfGrows;
@@ -24,7 +24,7 @@ public record CropTemplate(string Name, int TickLength, Rarity Rarity,
         {
             var strings = new List<string>();
 
-            strings.Add($"Grows every {TickLength} seconds");
+            strings.Add(GrowCondition.Description());
             strings.Add($"Takes {EffectiveMaxLevel} Grows to harvest");
 
             foreach (var activity in CropBehaviors.AllActivities())
@@ -53,7 +53,7 @@ public record CropTemplate(string Name, int TickLength, Rarity Rarity,
         return crop;
     }
 
-    public static CropTemplate GetRandomOfRarity(Rarity rarity)
+    public static CropTemplate GetRandomOfRarity(Rarity rarity, CropTemplate excluding = null)
     {
         var templates = new List<CropTemplate>();
         foreach (var template in CropTemplate.AllTemplates)
@@ -64,7 +64,14 @@ public record CropTemplate(string Name, int TickLength, Rarity Rarity,
             }
         }
 
-        return Client.Random.Clean.GetRandomElement(templates);
+        var result = Client.Random.Clean.GetRandomElement(templates);
+
+        while (result == excluding)
+        {
+            result = Client.Random.Clean.GetRandomElement(templates);
+        }
+
+        return result;
     }
 
     public static List<CropTemplate> AllTemplates = CropTemplate.GenerateAllTemplates().ToList();
@@ -75,9 +82,9 @@ public record CropTemplate(string Name, int TickLength, Rarity Rarity,
         
         yield return new CropTemplate(
             "Collard",
-            3,
+            new NormalGrowCondition(3),
             Rarity.Common,
-            new CropGraphic(2, 0),
+            new CropGraphic(2, 14),
             new CropBehaviors()
                 .WhenHarvested(CropActivity.GainEnergy(20))
                 .WhenHarvested(CropActivity.Recycle())
@@ -85,9 +92,9 @@ public record CropTemplate(string Name, int TickLength, Rarity Rarity,
         
         yield return new CropTemplate(
             "Spinach",
-            3,
-            Rarity.Common,
-            new CropGraphic(3, 0),
+            new NormalGrowCondition(3),
+            Rarity.Rare,
+            new CropGraphic(2, 17),
             new CropBehaviors()
                 .WhenGrow(CropActivity.GainEnergy(5))
                 .WhenHarvested(CropActivity.GainEnergy(25))
@@ -96,9 +103,9 @@ public record CropTemplate(string Name, int TickLength, Rarity Rarity,
 
         yield return new CropTemplate(
             "Parsnip",
-            5,
+            new NormalGrowCondition(5),
             Rarity.Rare,
-            new CropGraphic(2, 5),
+            new CropGraphic(2, 20),
             new CropBehaviors()
                 .WhenHarvested(CropActivity.GainEnergy(50))
                 .WhenHarvested(CropActivity.Recycle())
@@ -108,22 +115,22 @@ public record CropTemplate(string Name, int TickLength, Rarity Rarity,
 
         yield return new CropTemplate(
             "Carrot",
-            10,
+            new NormalGrowCondition(10),
             Rarity.Common,
             new CropGraphic(1, 3),
             new CropBehaviors()
-                .WhenHarvested(CropActivity.GainCardOfRarity(Rarity.Common))
+                .WhenHarvested(CropActivity.GainCardOfRarity(Rarity.Common, "Carrot"))
                 .WhenHarvested(CropActivity.GainEnergy(15))
                 .WhenHarvested(CropActivity.Recycle())
         );
         
         yield return new CropTemplate(
             "Beet",
-            10,
+            new NormalGrowCondition(10),
             Rarity.Common,
-            new CropGraphic(1, 3),
+            new CropGraphic(1, 23),
             new CropBehaviors()
-                .WhenHarvested(CropActivity.GainCardOfRarity(Rarity.Rare))
+                .WhenHarvested(CropActivity.GainCardOfRarity(Rarity.Rare, "Beet"))
                 .WhenHarvested(CropActivity.Recycle())
         );
         
@@ -141,99 +148,107 @@ public record CropTemplate(string Name, int TickLength, Rarity Rarity,
         
         yield return new CropTemplate(
             "Kohlrabi",
-            10,
+            new NormalGrowCondition(10),
             Rarity.Rare,
-            new CropGraphic(1, 3),
+            new CropGraphic(1, 25),
             new CropBehaviors()
                 .WhenHarvested(CropActivity.GainCardOfRarity(Rarity.Legendary))
-                .WhenHarvested(CropActivity.Recycle())
         );
         
         // UTILITY
 
         yield return new CropTemplate(
             "Watermelon",
-            5,
+            new NormalGrowCondition(1),
             Rarity.Rare,
             new CropGraphic(3, 10),
             new CropBehaviors()
-                .WhenHarvested(CropActivity.WaterAdjacentCrops())
+                .WhenHarvested(CropActivity.ForceAdjacentTilesToBeWatered())
                 .WhenHarvested(CropActivity.Recycle())
         );
         
-        yield return new CropTemplate(
-            "Potato",
-            5,
-            Rarity.Rare,
-            new CropGraphic(3, 10),
-            new CropBehaviors()
-                .WhenHarvested(CropActivity.TillAdjacentCrops())
-                .WhenHarvested(CropActivity.Recycle())
-        );
-        
-        yield return new CropTemplate(
-            "Corn",
-            5,
-            Rarity.Common,
-            new CropGraphic(3, 10),
-            new CropBehaviors()
-                .WhenHarvested(CropActivity.RestoreAdjacentCrops())
-                .WhenHarvested(CropActivity.Recycle())
-        );
+        // yield return new CropTemplate(
+        //     "Potato",
+        //     new NormalGrowCondition(5),
+        //     Rarity.Common,
+        //     new CropGraphic(3, 27),
+        //     new CropBehaviors()
+        //         .WhenHarvested(CropActivity.TillAdjacentCrops())
+        //         .WhenHarvested(CropActivity.Recycle())
+        // );
+        //
+        // yield return new CropTemplate(
+        //     "Corn",
+        //     new NormalGrowCondition(5),
+        //     Rarity.Common,
+        //     new CropGraphic(3, 5),
+        //     new CropBehaviors()
+        //         .WhenHarvested(CropActivity.RestoreAdjacentCrops())
+        //         .WhenHarvested(CropActivity.Recycle())
+        // );
         
         // CARD DRAW
         
         yield return new CropTemplate(
             "Onion",
-            2,
+            new NormalGrowCondition(2),
             Rarity.Common,
-            new CropGraphic(2, 3),
+            new CropGraphic(2, 31),
             new CropBehaviors()
-                .WhenHarvested(CropActivity.DrawCard(1))
+                .WhenHarvested(CropActivity.DrawCard(2))
                 .WhenHarvested(CropActivity.GainEnergy(25))
                 .WhenHarvested(CropActivity.Recycle())
         );
         
-        yield return new CropTemplate(
-            "Radish",
-            2,
-            Rarity.Rare,
-            new CropGraphic(2, 3),
-            new CropBehaviors()
-                .WhenHarvested(CropActivity.DrawCard(2))
-                .WhenHarvested(CropActivity.Recycle())
-        );
+        // yield return new CropTemplate(
+        //     "Radish",
+        //     2,
+        //     Rarity.Rare,
+        //     new CropGraphic(2, 3),
+        //     new CropBehaviors()
+        //         .WhenHarvested(CropActivity.DrawCard(2))
+        //         .WhenHarvested(CropActivity.Recycle())
+        // );
         
         // SPECIAL
         
         yield return new CropTemplate(
-            "Turnip",
-            5,
+            "Pumpkin",
+            new SurroundedByCrops(10),
             Rarity.Legendary,
-            new CropGraphic(3, 10),
+            new CropGraphic(3, 34),
             new CropBehaviors()
-                .WhenHarvested(CropActivity.ReShuffleForFree())
+                .WhenHarvested(CropActivity.WinGame())
         );
         
-        yield return new CropTemplate(
-            "Bok Choy",
-            5,
-            Rarity.Rare,
-            new CropGraphic(2, 10),
-            new CropBehaviors()
-                .WhenHarvested(CropActivity.GrowAdjacentCrops())
-                .WhenHarvested(CropActivity.Recycle())
-        );
+        // yield return new CropTemplate(
+        //     "Turnip",
+        //     5,
+        //     Rarity.Legendary,
+        //     new CropGraphic(3, 10),
+        //     new CropBehaviors()
+        //         .WhenHarvested(CropActivity.ReShuffleForFree())
+        // );
         
-        yield return new CropTemplate(
-            "Cabbage",
-            5,
-            Rarity.Rare,
-            new CropGraphic(2, 10),
-            new CropBehaviors()
-                .WhenHarvested(CropActivity.DoubleHarvestAdjacentCrops())
-                .WhenHarvested(CropActivity.Recycle())
-        );
+        // yield return new CropTemplate(
+        //     "Bok Choy",
+        //     5,
+        //     Rarity.Rare,
+        //     new CropGraphic(2, 10),
+        //     new CropBehaviors()
+        //         .WhenHarvested(CropActivity.GrowAdjacentCrops())
+        //         .WhenHarvested(CropActivity.Recycle())
+        // );
+        
+        // yield return new CropTemplate(
+        //     "Cabbage",
+        //     5,
+        //     Rarity.Rare,
+        //     new CropGraphic(2, 10),
+        //     new CropBehaviors()
+        //         .WhenHarvested(CropActivity.DoubleHarvestAdjacentCrops())
+        //         .WhenHarvested(CropActivity.Recycle())
+        // );
     }
 
     public static CropTemplate GetByName(string name)

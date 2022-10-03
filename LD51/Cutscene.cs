@@ -185,4 +185,8 @@ public class Cutscene
         
         EnqueueShowMessage("\"Restore this forgotten wasteland\"", 2);
     }
+
+    public void End()
+    {
+    }
 }

@@ -94,7 +94,7 @@ public class Tiles : BaseComponent
                 var progress = !crop.IsReadyToHarvest ? $"\n{crop.PercentInCurrentLevel}%" : "";
 
                 cropDescription =
-                    $"Grows every {crop.Template.TickLength} seconds.\nLevel {crop.Level + 1} / {crop.Template.EffectiveMaxLevel + 1}{progress}";
+                    $"{crop.Template.GrowCondition.Description()}\nLevel {crop.Level + 1} / {crop.Template.EffectiveMaxLevel + 1}{progress}";
             }
         }
 

@@ -14,12 +14,21 @@ public record CropActivity(string Description, CropEvent Behavior)
         return new CropActivity($"Put a {template.Name} in Discard Pile", data => { Fx.PutCardInDiscard(data.Position.Rectangle.Center.ToVector2(), template); });   
     }
     
-    public static CropActivity GainCardOfRarity(Rarity rarity)
+    public static CropActivity GainCardOfRarity(Rarity rarity, string excludingByName = null)
     {
-        return new CropActivity($"Put a random {rarity} Seed in Discard Pile", data => { Fx.PutCardInDiscard(data.Position.Rectangle.Center.ToVector2(), CropTemplate.GetRandomOfRarity(rarity)); });   
+        return new CropActivity($"Put a random {rarity} Seed in Discard Pile", data =>
+        {
+            CropTemplate excludedCrop = null;
+            if(!string.IsNullOrEmpty(excludingByName))
+            {
+                excludedCrop = CropTemplate.GetByName(excludingByName);
+            }
+            
+            Fx.PutCardInDiscard(data.Position.Rectangle.Center.ToVector2(), CropTemplate.GetRandomOfRarity(rarity, excludedCrop));
+        });   
     }
 
-    public static CropActivity WaterAdjacentCrops()
+    public static CropActivity ForceAdjacentTilesToBeWatered()
     {
         return new CropActivity("Water neighboring Soil", data =>
         {
@@ -28,12 +37,8 @@ public record CropActivity(string Description, CropEvent Behavior)
                 for (int y = -1; y <= 1; y++)
                 {
                     var position = data.Position.GridPosition + new Point(x, y);
-                    var content = data.Tiles.GetContentAt(position);
-
-                    if (content.IsTilled)
-                    {
-                        Fx.WaterTile(position);
-                    }
+                    data.Tiles.SetContentAt(position, TileContent.WateredL3);
+                    Fx.WaterTile(position);
                 }
                 
             }
@@ -152,6 +157,14 @@ public record CropActivity(string Description, CropEvent Behavior)
                 }
                 
             }
+        });
+    }
+
+    public static CropActivity WinGame()
+    {
+        return new CropActivity("Summons another Golem", data =>
+        {
+            LudumCartridge.Cutscene.End();
         });
     }
 }
