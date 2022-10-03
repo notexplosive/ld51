@@ -65,6 +65,15 @@ public class Garden : BaseComponent
 
     public void KillAllCrops()
     {
+        foreach (var kv in _map)
+        {
+            var crop = kv.Value;
+            if (crop.Template.CropBehaviors.Harvested.Contains(CropActivity.Recycle()))
+            {
+                Fx.PutCardInDiscard(LudumCartridge.World.Tiles.GetRectangleAt(kv.Key).Center.ToVector2(), crop.Template);
+            }
+        }
+        
         _map.Clear();
     }
 

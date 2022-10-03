@@ -21,6 +21,7 @@ public class Card : BaseComponent
         _hoverable = RequireComponent<Hoverable>();
         _inventory = inventory;
         CropTemplate = cropTemplate;
+        HoverTimer = 1f;
     }
 
     public float HoverTimer { get; private set; }

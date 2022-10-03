@@ -133,7 +133,6 @@ public class World
             return false;
         }
 
-        var outOfCards = ui.Deck.IsEmpty() && ui.Inventory.Count == 0;
         var noCrops = !world.Garden.HasAnyCrop();
         var cannotPlayAnyCards = ui.Inventory.Count == 0 || !world.Tiles.HasAnyWateredTiles();
         var cannotDraw = !PlayerStats.Energy.CanAfford(A.DrawCardCost) || ui.Deck.IsEmpty();
@@ -144,7 +143,7 @@ public class World
         var cannotTillAnyTiles =
             !world.Tiles.HasAnyContent(TileContent.Dirt) || !PlayerStats.Energy.CanAfford(A.TillCost);
 
-        if (outOfCards && noCrops)
+        if (ui.Deck.IsEmpty() && noCrops)
         {
             // More permissive: there's nothing _interesting_ you can do
             return cannotPlayAnyCards && cannotDraw && noPendingCrops;

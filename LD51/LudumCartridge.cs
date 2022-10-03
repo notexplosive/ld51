@@ -196,6 +196,8 @@ public class LudumCartridge : MachinaCartridge
                     CropTemplate.GetByName("Carrot"));
                 Fx.PutCardInDiscard(Fx.UiSpaceToGameSpace(ui.ReshuffleButtonBox.Rectangle.Center.ToVector2()),
                     CropTemplate.GetByName("Carrot"));
+                Fx.PutCardInDiscard(Fx.UiSpaceToGameSpace(ui.ReshuffleButtonBox.Rectangle.Center.ToVector2()),
+                    CropTemplate.GetByName("Beet"));
                 tutorial.Clear();
             });
 

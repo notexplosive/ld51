@@ -73,7 +73,7 @@ public record CropActivity(string Description, CropEvent Behavior)
 
     public static CropActivity RestoreAdjacentCrops()
     {
-        return new CropActivity("Till neighboring Dirt", data =>
+        return new CropActivity("Restore neighboring Unusable Soil into Dirt", data =>
         {
             for (int x = -1; x <= 1; x++)
             {
@@ -93,9 +93,16 @@ public record CropActivity(string Description, CropEvent Behavior)
         });
     }
 
-    public static CropActivity DrawCard()
+    public static CropActivity DrawCard(int number)
     {
-        return new CropActivity("Draw a Seed from the deck at no cost", data => LudumCartridge.Ui.Inventory.DrawNextCard(true));
+        var s = number > 0 ? "s" : ""; 
+        return new CropActivity($"Draw {number} Seed{s} from the deck at no cost", data =>
+        {
+            for (int i = 0; i < number; i++)
+            {
+                LudumCartridge.Ui.Inventory.DrawNextCard(true);
+            }
+        });
     }
 
     public static CropActivity ReShuffleForFree()

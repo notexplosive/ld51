@@ -7,6 +7,19 @@ public class CropActivityCollection
     private readonly string _verb;
     private readonly List<CropActivity> _activities = new();
 
+    public bool Contains(CropActivity target)
+    {
+        foreach (var activity in _activities)
+        {
+            if (activity.Description == target.Description)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public CropActivityCollection(string verb)
     {
         _verb = verb;
