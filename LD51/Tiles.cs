@@ -91,8 +91,10 @@ public class Tiles : BaseComponent
             var crop = LudumCartridge.World.Garden.GetCropAt(tilePosition);
             if (!crop.IsReadyToHarvest)
             {
+                var progress = !crop.IsReadyToHarvest ? $"\n{crop.PercentInCurrentLevel}%" : "";
+                
                 cropDescription =
-                    $"{crop.Level + 1} / {crop.Template.EffectiveMaxLevel + 1}";
+                    $"Grows every {crop.Template.TickLength} seconds.\nLevel {crop.Level + 1} / {crop.Template.EffectiveMaxLevel + 1}{progress}";
             }
         }
 
@@ -106,10 +108,15 @@ public class Tiles : BaseComponent
         if (tapAction is TapError && hasCrop)
         {
             var crop = LudumCartridge.World.Garden.GetCropAt(tilePosition);
-            LudumCartridge.Ui.Tooltip.Set(crop.Template.Name, $"{cropDescription}{newline}{GetContentAt(tilePosition).Name}");
+            LudumCartridge.Ui.Tooltip.Set(crop.Template.Name, $"{cropDescription}");
         }
         else
         {
+            if (cropDescription != "")
+            {
+                var crop = LudumCartridge.World.Garden.GetCropAt(tilePosition);
+                cropDescription = $"\n{crop.Template.Name}\n"+cropDescription;
+            }
             LudumCartridge.Ui.Tooltip.Set(tapAction.Title, $"{tapAction.Description}{newline}{cropDescription}");
         }
 

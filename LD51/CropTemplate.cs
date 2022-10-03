@@ -61,6 +61,7 @@ public record CropTemplate(string Name, int TickLength, Rarity Rarity,
             var strings = new List<string>();
             
             strings.Add($"Grows every {TickLength} seconds");
+            strings.Add($"Takes {EffectiveMaxLevel} Grows to harvest");
             
             foreach (var activity in CropBehaviors.AllActivities())
             {

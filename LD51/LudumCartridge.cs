@@ -69,7 +69,7 @@ public class LudumCartridge : MachinaCartridge
         });
 
         yield return new LoadEvent("Water", () => new GridBasedSpriteSheet("water", new Point(64)));
-        
+
         yield return new LoadEvent("MenuBackground", () =>
         {
             var canvas = new Canvas(512, 512);
@@ -78,13 +78,15 @@ public class LudumCartridge : MachinaCartridge
             Client.Graphics.PushCanvas(canvas);
             Client.Graphics.Painter.BeginSpriteBatch(SamplerState.LinearWrap, Matrix.Identity);
             var ints = new[] {0, 2, 3};
-            for (int x = 0; x < canvas.Size.X; x += 64)
+            for (var x = 0; x < canvas.Size.X; x += 64)
             {
-                for (int y = 0; y < canvas.Size.Y; y += 64)
+                for (var y = 0; y < canvas.Size.Y; y += 64)
                 {
-                    tiles.DrawFrame(Client.Graphics.Painter, Client.Random.Dirty.GetRandomElement(ints), new Vector2(x,y), Scale2D.One, new DrawSettings());
+                    tiles.DrawFrame(Client.Graphics.Painter, Client.Random.Dirty.GetRandomElement(ints),
+                        new Vector2(x, y), Scale2D.One, new DrawSettings());
                 }
             }
+
             Client.Graphics.Painter.EndSpriteBatch();
             Client.Graphics.PopCanvas();
 
@@ -105,7 +107,7 @@ public class LudumCartridge : MachinaCartridge
     private void BuildGameplay()
     {
         _gameStarted = true;
-        
+
         A.TileSheet = Client.Assets.GetAsset<SpriteSheet>("Tiles");
         A.TileRect = A.TileSheet.GetSourceRectForFrame(0);
 
@@ -185,13 +187,15 @@ public class LudumCartridge : MachinaCartridge
                 tutorial.TellPlayerToClickOn(
                     ui.ReshuffleButtonBox.Rectangle, "Nothing else you can do...");
             });
-        
+
         tutorial.AddTrigger(
-            ()=> LudumCartridge.Cutscene.IsPlaying(),
+            () => LudumCartridge.Cutscene.IsPlaying(),
             () =>
             {
-                Fx.PutCardInDiscard(Fx.UiSpaceToGameSpace(ui.ReshuffleButtonBox.Rectangle.Center.ToVector2()), CropTemplate.Carrot);
-                Fx.PutCardInDiscard(Fx.UiSpaceToGameSpace(ui.ReshuffleButtonBox.Rectangle.Center.ToVector2()), CropTemplate.Carrot);
+                Fx.PutCardInDiscard(Fx.UiSpaceToGameSpace(ui.ReshuffleButtonBox.Rectangle.Center.ToVector2()),
+                    CropTemplate.Carrot);
+                Fx.PutCardInDiscard(Fx.UiSpaceToGameSpace(ui.ReshuffleButtonBox.Rectangle.Center.ToVector2()),
+                    CropTemplate.Carrot);
                 tutorial.Clear();
             });
 
@@ -204,8 +208,10 @@ public class LudumCartridge : MachinaCartridge
         }
 
         ui.Inventory.DrawNextCard(true);
-        
+
+#if !DEBUG
         Cutscene.PlayOpening();
+#endif
     }
 
     public override void BeforeUpdate(float dt)

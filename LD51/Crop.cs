@@ -35,6 +35,7 @@ public class Crop
     public int Level => CurrentFrameOffset;
 
     public bool IsReadyToHarvest => CurrentFrameOffset == Template.EffectiveMaxLevel;
+    public int PercentInCurrentLevel => (int)(_timeAtCurrentLevel / Template.TickLength * 100);
 
     public void Draw(Painter painter, Vector2 renderPos, Depth depth)
     {
