@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using MachinaLite;
+using Microsoft.Xna.Framework;
 
 namespace LD51;
 
 public class Garden : BaseComponent
 {
-    private readonly Dictionary<TilePosition, Crop> _map = new();
+    private readonly Dictionary<Point, Crop> _map = new();
 
     public Garden(Actor actor) : base(actor)
     {
@@ -14,22 +15,27 @@ public class Garden : BaseComponent
     public void PlantCrop(CropEventData data)
     {
         var crop = data.Template.CreateCrop(data);
-        _map[data.Position] = crop;
+        _map[data.Position.GridPosition] = crop;
     }
 
     public bool IsEmpty(TilePosition tilePosition)
     {
-        return !_map.ContainsKey(tilePosition);
+        return !_map.ContainsKey(tilePosition.GridPosition);
     }
 
-    public IEnumerable<TilePosition> FilledPositions()
+    public IEnumerable<Point> FilledPositions()
     {
         return _map.Keys;
     }
 
     public Crop GetCropAt(TilePosition position)
     {
-        return _map[position];
+        return _map[position.GridPosition];
+    }
+    
+    public Crop GetCropAt(Point gridPosition)
+    {
+        return _map[gridPosition];
     }
 
     public IEnumerable<Crop> AllCrops()
@@ -44,12 +50,17 @@ public class Garden : BaseComponent
 
     public bool HasCropAt(TilePosition position)
     {
-        return _map.ContainsKey(position);
+        return _map.ContainsKey(position.GridPosition);
+    }
+    
+    public bool HasCropAt(Point gridPosition)
+    {
+        return _map.ContainsKey(gridPosition);
     }
 
     public void RemoveCropAt(TilePosition position)
     {
-        _map.Remove(position);
+        _map.Remove(position.GridPosition);
     }
 
     public void KillAllCrops()

@@ -1,3 +1,3 @@
 ﻿namespace LD51;
 
-public record CropGraphic(int NumberOfFrames, int FirstFrame);
+public record CropGraphic(int NumberOfGrows, int FirstFrame);

@@ -193,9 +193,9 @@ public class LudumCartridge : MachinaCartridge
             () =>
             {
                 Fx.PutCardInDiscard(Fx.UiSpaceToGameSpace(ui.ReshuffleButtonBox.Rectangle.Center.ToVector2()),
-                    CropTemplate.Carrot);
+                    CropTemplate.GetByName("Carrot"));
                 Fx.PutCardInDiscard(Fx.UiSpaceToGameSpace(ui.ReshuffleButtonBox.Rectangle.Center.ToVector2()),
-                    CropTemplate.Carrot);
+                    CropTemplate.GetByName("Carrot"));
                 tutorial.Clear();
             });
 
@@ -204,7 +204,7 @@ public class LudumCartridge : MachinaCartridge
 
         for (var i = 0; i < 5; i++)
         {
-            ui.Deck.AddCard(CropTemplate.Potato);
+            ui.Deck.AddCard(CropTemplate.GetByName("Collard"));
         }
 
         ui.Inventory.DrawNextCard(true);

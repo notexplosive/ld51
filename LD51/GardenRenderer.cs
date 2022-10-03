@@ -17,9 +17,10 @@ internal class GardenRenderer : BaseComponent
         foreach (var tilePosition in _garden.FilledPositions())
         {
             var crop = _garden.GetCropAt(tilePosition);
-            var renderPos = tilePosition.Rectangle.Center.ToVector2();
+            var rect = LudumCartridge.World.Tiles.GetRectangleAt(tilePosition);
+            var renderPos = rect.Center.ToVector2();
 
-            crop.Draw(painter, renderPos, Transform.Depth - 2 - tilePosition.GridPosition.Y);
+            crop.Draw(painter, renderPos, Transform.Depth - 2 - tilePosition.Y);
         }
     }
 

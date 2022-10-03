@@ -66,9 +66,13 @@ public class Crop
         _tween.Update(dt);
     }
 
-    private void Grow()
+    public void Grow(bool keepTimeAtCurrentLevel = false)
     {
-        _timeAtCurrentLevel = 0;
+        if (!keepTimeAtCurrentLevel)
+        {
+            _timeAtCurrentLevel = 0;
+        }
+
         var scaleX = new TweenableFloat(() => _scale.X, x => _scale = new Vector2(x, _scale.Y));
         var scaleY = new TweenableFloat(() => _scale.Y, y => _scale = new Vector2(_scale.X, y));
 
@@ -108,9 +112,13 @@ public class Crop
     public event CropEvent FinishedGrowing;
     public event CropEvent Harvested;
 
-    public void Harvest()
+    public void Harvest(bool skipRemove = false)
     {
-        _garden.RemoveCropAt(_position);
+        if (!skipRemove)
+        {
+            _garden.RemoveCropAt(_position);
+        }
+
         Harvested?.Invoke(_data);
     }
 }
