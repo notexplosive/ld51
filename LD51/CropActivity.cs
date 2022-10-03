@@ -164,7 +164,7 @@ public record CropActivity(string Description, CropEvent Behavior)
     {
         return new CropActivity("Summons another Golem", data =>
         {
-            LudumCartridge.Cutscene.End();
+            LudumCartridge.Cutscene.PlayEnding();
         });
     }
 }

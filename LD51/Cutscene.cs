@@ -190,7 +190,7 @@ public class Cutscene
         EnqueueShowMessage("\"Restore this forgotten wasteland\"");
     }
 
-    public void End()
+    public void PlayEnding()
     {
         Tween.Add(new Tween<float>(_faderOpacity, 1f, 1f, Ease.Linear));
 
