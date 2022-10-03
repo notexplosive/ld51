@@ -1,4 +1,5 @@
-﻿using ExplogineMonoGame;
+﻿using ExplogineCore.Data;
+using ExplogineMonoGame;
 using ExplogineMonoGame.Data;
 using ExTween;
 using MachinaLite;
@@ -18,6 +19,7 @@ public class ErrorToast : BaseComponent
 
     public void ShowError(string errorText)
     {
+        Client.SoundPlayer.Play("blem", new SoundEffectOptions());
         _tween.Clear();
         _opacity.Value = 0f;
         _text = errorText;

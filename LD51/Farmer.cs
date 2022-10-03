@@ -1,4 +1,5 @@
 ﻿using System;
+using ExplogineCore.Data;
 using ExplogineMonoGame;
 using ExplogineMonoGame.AssetManagement;
 using ExplogineMonoGame.Data;
@@ -126,9 +127,11 @@ public class Farmer : BaseComponent
                 dynamicResult.Add(new CallbackTween(() => _toolAngle.Value = 0f));
                 dynamicResult.Add(ShowTool(Tool.Hoe));
                 dynamicResult.Add(new Tween<float>(_toolAngle, -MathF.PI / 2f, 0.25f, Ease.QuadFastSlow));
+                dynamicResult.Add(new CallbackTween(() => Client.SoundPlayer.Play("till", new SoundEffectOptions())));
                 dynamicResult.Add(new Tween<float>(_toolAngle, MathF.PI / 4f, 0.15f, Ease.QuadSlowFast));
                 dynamicResult.Add(new WaitSecondsTween(0.15f));
                 dynamicResult.Add(new Tween<float>(_toolAngle, -MathF.PI / 2f, 0.25f, Ease.QuadFastSlow));
+                dynamicResult.Add(new CallbackTween(() => Client.SoundPlayer.Play("till", new SoundEffectOptions())));
                 dynamicResult.Add(new Tween<float>(_toolAngle, MathF.PI / 4f, 0.15f, Ease.QuadSlowFast));
                 dynamicResult.Add(new WaitSecondsTween(0.15f));
                 dynamicResult.Add(new CallbackTween(UpgradeCurrentTile));

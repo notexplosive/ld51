@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using ExplogineCore.Data;
+using ExplogineMonoGame;
 using ExplogineMonoGame.HitTesting;
 using ExplogineMonoGame.Input;
 using MachinaLite;
@@ -74,11 +76,13 @@ public class Inventory : BaseComponent
 
     public void DrawNextCard(bool skipCost = false)
     {
+        
         var cost = A.DrawCardCost;
         var canAfford = PlayerStats.Energy.CanAfford(cost) || skipCost;
 
         if (!IsFull() && LudumCartridge.Ui.Deck.IsNotEmpty() && canAfford)
         {
+            Client.SoundPlayer.Play("draw-card", new SoundEffectOptions());
             if (!skipCost)
             {
                 PlayerStats.Energy.Consume(cost);
@@ -129,6 +133,7 @@ public class Inventory : BaseComponent
 
     public void Grab(Card card)
     {
+        Client.SoundPlayer.Play("paper", new SoundEffectOptions());
         GrabbedCard = card;
     }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using ExplogineCore.Data;
 using ExplogineMonoGame;
 using ExplogineMonoGame.AssetManagement;
 using ExplogineMonoGame.Data;
@@ -92,6 +93,9 @@ public static class Fx
         var tiles = LudumCartridge.World.Tiles;
         if (tiles.GetContentAt(gridPosition).IsTilled)
         {
+            
+            Client.SoundPlayer.Play("splash", new SoundEffectOptions());
+
             var water = LudumCartridge.World.Scene.AddActor("Water");
             water.Transform.Position = tiles.GetRectangleAt(gridPosition).Center.ToVector2();
             water.Transform.Depth += 50;
@@ -135,6 +139,7 @@ public static class Fx
             var duration = 1f;
             var tweenOwner = new TweenOwner(particle);
             tweenOwner.Tween = new SequenceTween()
+                    .Add(new CallbackTween(()=>Client.SoundPlayer.Play("draw-card", new SoundEffectOptions())))
                     .Add(
                         new MultiplexTween()
                             .AddChannel(new Tween<Vector2>(positionTweenable,

@@ -73,6 +73,31 @@ public class Crop
             _timeAtCurrentLevel = 0;
         }
 
+        AnimateBob();
+
+        if (CurrentFrameOffset < Template.EffectiveMaxLevel)
+        {
+            _tiles.SetContentAt(_position, _tiles.GetContentAt(_position).Drain());
+            CurrentFrameOffset++;
+
+            
+            
+            Grew?.Invoke(_data);
+
+            if (IsReadyToHarvest)
+            {
+                FinishedGrowing?.Invoke(_data);
+                Client.SoundPlayer.Play("tag2", new SoundEffectOptions());
+            }
+            else
+            {
+                Client.SoundPlayer.Play("tag", new SoundEffectOptions());
+            }
+        }
+    }
+
+    public void AnimateBob()
+    {
         var scaleX = new TweenableFloat(() => _scale.X, x => _scale = new Vector2(x, _scale.Y));
         var scaleY = new TweenableFloat(() => _scale.Y, y => _scale = new Vector2(_scale.X, y));
 
@@ -93,19 +118,6 @@ public class Crop
                     .AddChannel(new Tween<float>(scaleY, 1f, 0.1f, Ease.QuadFastSlow))
             )
             ;
-
-        if (CurrentFrameOffset < Template.EffectiveMaxLevel)
-        {
-            _tiles.SetContentAt(_position, _tiles.GetContentAt(_position).Drain());
-            CurrentFrameOffset++;
-
-            Grew?.Invoke(_data);
-
-            if (IsReadyToHarvest)
-            {
-                FinishedGrowing?.Invoke(_data);
-            }
-        }
     }
 
     public event CropEvent Grew;
@@ -117,7 +129,9 @@ public class Crop
         if (!skipRemove)
         {
             _garden.RemoveCropAt(_position);
+            Client.SoundPlayer.Play("brush", new SoundEffectOptions());
         }
+        
 
         Harvested?.Invoke(_data);
     }

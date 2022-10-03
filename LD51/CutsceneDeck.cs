@@ -90,13 +90,18 @@ public class CutsceneDeck : BaseComponent
         return new CallbackTween(
             () =>
             {
+                Client.SoundPlayer.Play("draw-card", new SoundEffectOptions());
                 _children.Add(index, new ChildCard((float) index / NumberOfCards * MathF.PI * 2));
             });
     }
 
     public ITween PullCardIn(int index)
     {
-        return new CallbackTween(() => _children[index].Pull());
+        return new CallbackTween(() =>
+        {
+            _children[index].Pull();
+            Client.SoundPlayer.Play("paper", new SoundEffectOptions());
+        });
     }
 
     public record ChildCard(float Angle)

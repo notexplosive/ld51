@@ -13,6 +13,18 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin blem.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:blem.ogg
+
+#begin brush.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:brush.ogg
+
 #begin card.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -24,6 +36,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:card.png
+
+#begin draw-card.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:draw-card.ogg
 
 #begin energy.png
 /importer:TextureImporter
@@ -49,6 +67,18 @@
 
 #begin OFL.txt
 /copy:OFL.txt
+
+#begin paper.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:paper.ogg
+
+#begin plant-sfx.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:plant-sfx.ogg
 
 #begin plant.png
 /importer:TextureImporter
@@ -86,6 +116,27 @@
 /processorParam:TextureFormat=Color
 /build:seed.png
 
+#begin Sound Attribution.txt
+/copy:Sound Attribution.txt
+
+#begin splash.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:splash.ogg
+
+#begin tag.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:tag.ogg
+
+#begin tag2.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:tag2.ogg
+
 #begin tiles.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -97,6 +148,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:tiles.png
+
+#begin till.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:till.ogg
 
 #begin tools.png
 /importer:TextureImporter

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using ExplogineCore.Data;
+using ExplogineMonoGame;
 using MachinaLite;
 using Microsoft.Xna.Framework;
 
@@ -15,7 +17,9 @@ public class Garden : BaseComponent
     public void PlantCrop(CropEventData data)
     {
         var crop = data.Template.CreateCrop(data);
+        crop.AnimateBob();
         _map[data.Position.GridPosition] = crop;
+        Client.SoundPlayer.Play("plant-sfx", new SoundEffectOptions());
     }
 
     public bool IsEmpty(TilePosition tilePosition)
@@ -32,7 +36,7 @@ public class Garden : BaseComponent
     {
         return _map[position.GridPosition];
     }
-    
+
     public Crop GetCropAt(Point gridPosition)
     {
         return _map[gridPosition];
@@ -52,7 +56,7 @@ public class Garden : BaseComponent
     {
         return _map.ContainsKey(position.GridPosition);
     }
-    
+
     public bool HasCropAt(Point gridPosition)
     {
         return _map.ContainsKey(gridPosition);
@@ -70,10 +74,11 @@ public class Garden : BaseComponent
             var crop = kv.Value;
             if (crop.Template.CropBehaviors.Harvested.Contains(CropActivity.Recycle()))
             {
-                Fx.PutCardInDiscard(LudumCartridge.World.Tiles.GetRectangleAt(kv.Key).Center.ToVector2(), crop.Template);
+                Fx.PutCardInDiscard(LudumCartridge.World.Tiles.GetRectangleAt(kv.Key).Center.ToVector2(),
+                    crop.Template);
             }
         }
-        
+
         _map.Clear();
     }
 
