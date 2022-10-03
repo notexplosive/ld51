@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using ExplogineMonoGame.Input;
 using MachinaLite;
 using MachinaLite.Components;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace LD51;
 
@@ -25,6 +27,14 @@ public class DiscardPile : BaseComponent
     public override void Update(float dt)
     {
         _text.Text = _content.Count.ToString();
+    }
+
+    public override void OnKey(Keys key, ButtonState state, ModifierKeys modifiers)
+    {
+        if (key == Keys.Q && modifiers.ControlShift && state == ButtonState.Pressed && !LudumCartridge.Cutscene.IsPlaying())
+        {
+            LudumCartridge.Cutscene.PlayReshuffle();
+        }
     }
 
     public void Reshuffle()
