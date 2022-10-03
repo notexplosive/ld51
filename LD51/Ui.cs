@@ -83,7 +83,7 @@ public class Ui
         reshuffleButtonActor.Transform.LocalDepth -= 10;
         ReshuffleButtonBox = new Box(reshuffleButtonActor, new Point(A.CardSize.X, A.CardSize.Y / 4));
         var renderer = new BoxRenderer(reshuffleButtonActor);
-        new TextInBox(reshuffleButtonActor, A.CardTextFont, "Reshuffle");
+        new TextInBox(reshuffleButtonActor, A.CardTextFont, "Sleep");
         new Hoverable(reshuffleButtonActor);
         new ReshuffleButton(reshuffleButtonActor);
         new ChangeOnHovered(
@@ -95,10 +95,10 @@ public class Ui
         {
             if (button == MouseButton.Left && !LudumCartridge.Cutscene.IsPlaying() && !LudumCartridge.World.FarmerIsBusy())
             {
-                LudumCartridge.Cutscene.PlayReshuffle();
+                LudumCartridge.Cutscene.GoToShop();
             }
         };
-        new TooltipOwner(reshuffleButtonActor, "Reshuffle", "Go to sleep for a few years.\nReshuffle your deck and gain some energy.\nChance to gain a free Common Seed.\nAll your crops will die soil will decay.");
+        new TooltipOwner(reshuffleButtonActor, "Reshuffle", "Go to sleep for a few years.\nAll your crops and soil will decay in the meantime.");
 
         var inventoryBackground = inventoryActor.Transform.AddActorAsChild("Background");
         inventoryBackground.Transform.LocalPosition += new Vector2(0, 32);

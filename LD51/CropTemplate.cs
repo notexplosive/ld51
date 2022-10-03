@@ -10,6 +10,7 @@ public enum Rarity
     Starter,
     Common,
     Rare,
+    Premium,
     Legendary
 }
 
@@ -145,7 +146,7 @@ public record CropTemplate(string Name, ICropGrowCondition GrowCondition, Rarity
         yield return new CropTemplate(
             "Kohlrabi",
             new GrowOverTime(10),
-            Rarity.Rare,
+            Rarity.Premium,
             new CropGraphic(1, 25),
             new CropBehaviors()
                 .WhenHarvested(CropActivity.GainCardOfRarity(Rarity.Legendary))

@@ -2,6 +2,7 @@
 using ExplogineMonoGame.AssetManagement;
 using MachinaLite;
 using MachinaLite.Components;
+using Microsoft.Xna.Framework;
 
 namespace LD51;
 
@@ -18,6 +19,10 @@ public class NinepatchRenderer : BaseComponent
 
     public override void Draw(Painter painter)
     {
-        _sheet.DrawFullNinepatch(painter, _box.Rectangle, InnerOuter.Inner, Transform.Depth, 1f);
+        var rect = _box.Rectangle;
+        rect.Offset(Offset);
+        _sheet.DrawFullNinepatch(painter, rect, InnerOuter.Inner, Transform.Depth, 1f);
     }
+
+    public Point Offset { get; set; }
 }

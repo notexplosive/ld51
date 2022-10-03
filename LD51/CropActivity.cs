@@ -69,7 +69,7 @@ public record CropActivity(string Description, CropEvent Behavior)
 
     public static CropActivity Recycle()
     {
-        return new CropActivity("Put self in Discard",
+        return new CropActivity("Recycle into Discard",
             (data, _) =>
         {
             Fx.PutCardInDiscard(data.Position.Rectangle.Center.ToVector2(), data.Template); 

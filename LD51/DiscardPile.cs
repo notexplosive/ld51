@@ -33,7 +33,7 @@ public class DiscardPile : BaseComponent
     {
         if (key == Keys.Q && modifiers.ControlShift && state == ButtonState.Pressed && !LudumCartridge.Cutscene.IsPlaying())
         {
-            LudumCartridge.Cutscene.PlayReshuffle();
+            LudumCartridge.Cutscene.GoToShop();
         }
     }
 

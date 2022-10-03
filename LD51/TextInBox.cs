@@ -23,7 +23,12 @@ public class TextInBox : BaseComponent
 
     public override void Draw(Painter painter)
     {
-        painter.DrawStringWithinRectangle(_font, Text, _box.Rectangle, Alignment.Center,
+        var rect = _box.Rectangle;
+        rect.Offset(Offset);
+        painter.DrawStringWithinRectangle(_font, Text, rect, Alignment,
             new DrawSettings {Color = Color, Depth = Transform.Depth - 1});
     }
+
+    public Alignment Alignment { get; set; } = Alignment.Center;
+    public Point Offset { get; set; }
 }

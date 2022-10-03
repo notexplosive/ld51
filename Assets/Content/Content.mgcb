@@ -137,6 +137,12 @@
 /processorParam:Quality=Best
 /build:splash.ogg
 
+#begin stapler.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:stapler.ogg
+
 #begin tag.ogg
 /importer:OggImporter
 /processor:SoundEffectProcessor

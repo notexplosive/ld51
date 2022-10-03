@@ -28,6 +28,7 @@ public class Tiles : BaseComponent
     public Point Dimensions { get; }
 
     public TilePosition? HoveredTile { get; set; }
+    public float UsableSoilPercent { get; set; }
 
     public void RandomizeContent()
     {
@@ -41,7 +42,7 @@ public class Tiles : BaseComponent
     {
         var roll = Client.Random.Clean.NextFloat();
 
-        if (roll < 0.15)
+        if (roll < 0.15 + UsableSoilPercent)
         {
             return TileContent.Dirt;
         }
