@@ -95,7 +95,7 @@ public class Tiles : BaseComponent
                 var progress = crop.ReportProgress();
 
                 cropDescription =
-                    $"{crop.Template.GrowCondition.Description()}\nLevel {crop.Level + 1} / {crop.Template.EffectiveMaxLevel + 1}{progress}";
+                    $"{crop.Template.Description}\nLevel {crop.Level + 1} / {crop.Template.EffectiveMaxLevel + 1}{progress}";
             }
         }
 

@@ -21,9 +21,9 @@ public class Cutscene
     private readonly TweenableFloat _musicVolume = new(0f);
     private readonly Actor _shop;
     private readonly Tweenable<float> _textOpacity = new TweenableFloat(0f);
-    private string _text;
     private readonly TextInBox _tooltipText;
     private bool _doneShopping;
+    private string _text;
 
     public Cutscene(Scene scene)
     {
@@ -60,21 +60,40 @@ public class Cutscene
         _shop = Scene.AddActor("Shop");
         _shop.Visible = false;
 
-        var shopItems = new ShopItem[]
+        ShopItem[] shopItems =
         {
-            new("Buy Collard", CropTemplate.GetByName("Collard").Description,
-                pos => Fx.PutCardInDiscard(pos, CropTemplate.GetByName("Collard"))),
+            new("Buy Collard", CropTemplate.GetByName("Collard").Description, 50,
+                (item, pos) => Fx.PutCardInDiscard(pos, CropTemplate.GetByName("Collard"))),
 
-            new("Buy Beet", CropTemplate.GetByName("Beet").Description,
-                pos => Fx.PutCardInDiscard(pos, CropTemplate.GetByName("Beet"))),
+            new("Buy Beet", CropTemplate.GetByName("Beet").Description, 100,
+                (item, pos) => Fx.PutCardInDiscard(pos, CropTemplate.GetByName("Beet"))),
 
-            new("Buy KohlRabi", CropTemplate.GetByName("Kohlrabi").Description,
-                pos => Fx.PutCardInDiscard(pos, CropTemplate.GetByName("Kohlrabi"))),
+            new("Buy KohlRabi", CropTemplate.GetByName("Kohlrabi").Description, 500,
+                (item, pos) =>
+                {
+                    Fx.PutCardInDiscard(pos, CropTemplate.GetByName("Kohlrabi"));
+                    item.Name = "SOLD OUT";
+                    item.Description = "SOLD OUT";
+                    item.Cost = -1;
+                    item.OnBuy = (item, pos) => { };
+                }),
 
-            new("Restore Wasteland", "Restores the Wasteland slightly, increasing the amount of usable soil",
-                pos => LudumCartridge.World.Tiles.UsableSoilPercent += 0.1f)
+            new("Restore Wasteland",
+                "Restores the Wasteland slightly, increasing the amount of usable soil", 100,
+                (item, pos) =>
+                {
+                    LudumCartridge.World.Tiles.UsableSoilPercent += 0.1f;
+                    item.Cost *= 2;
+
+                    if (LudumCartridge.World.Tiles.UsableSoilPercent > 1f)
+                    {
+                        item.Cost = -1;
+                        item.Name = "Fully Restored!";
+                        item.Description = "You did it (grow a pumpkin now)";
+                        item.OnBuy = (item, pos) => { };
+                    }
+                })
         };
-        
 
         var wholeScreen = Client.Window.RenderResolution;
         var tooltip = _shop.Transform.AddActorAsChild("Tooltip");
@@ -84,11 +103,8 @@ public class Cutscene
         _tooltipText = new TextInBox(tooltip, A.CardTextFont, "Tooltip text");
         _tooltipText.Alignment = Alignment.TopCenter;
         _tooltipText.Color = Color.White;
-        
-        new Updater(tooltip, (dt) =>
-        {
-            _tooltipText.Text = "";
-        });
+
+        new Updater(tooltip, dt => { _tooltipText.Text = ""; });
 
         var paddingBetweenItems = 100;
         var allItemsWidth = shopItems.Length * A.CardSize.X + (paddingBetweenItems * shopItems.Length - 1);
@@ -99,51 +115,26 @@ public class Cutscene
         foreach (var item in shopItems)
         {
             var buyButton = buttons.Transform.AddActorAsChild("Buy Button");
-            var padding = index > 0 ? paddingBetweenItems : 0;
             buyButton.Transform.LocalPosition = new Vector2(index * A.CardSize.X + paddingBetweenItems * index, 0);
-            var buyBox = new Box(buyButton, A.CardSize);
-            var patch = new NinepatchRenderer(buyButton, Client.Assets.GetAsset<NinepatchSheet>("Card-Patch"));
-            var text = new TextInBox(buyButton, A.CardTextFont, item.Name);
-            new Hoverable(buyButton);
-            var hovered = false;
-            new ChangeOnHovered(buyButton,
-                () =>
-                {
-                    if (!hovered)
-                    {
-                        Client.SoundPlayer.Play("draw-card");
-                    }
-
-                    hovered = true;
-                },
-                () => hovered = false);
-
-            new Updater(buyButton,
-                dt =>
-                {
-                    if (hovered)
-                    {
-                        patch.Offset = new Point(0, -25);
-                        text.Offset = new Point(0, -25);
-                        text.Color = Color.White;
-                        _tooltipText.Text = item.Description;
-                    }
-                    else
-                    {
-                        patch.Offset = new Point(0, 0);
-                        text.Offset = new Point(0, 0);
-                        text.Color = Color.Black;
-                    }
-                });
-
-            new Clickable(buyButton).Clicked += button =>
+            MakeButton(buyButton, A.CardSize, ()=>$"{item.Name}\n\n{item.Cost} Energy", item.Description, () =>
             {
-                if (button == MouseButton.Left)
+                if (item.Cost < 0)
                 {
-                    item.OnBuy(buyBox.Rectangle.Center.ToVector2());
-                    Client.SoundPlayer.Play("stapler", new SoundEffectOptions{Volume = 0.5f, Pitch = 1f});
+                    // negative cost means "sold out"
+                    return;
                 }
-            };
+                
+                if (PlayerStats.Energy.CanAfford(item.Cost))
+                {
+                    item.OnBuy(item, buyButton.GetComponent<Box>()!.Rectangle.Center.ToVector2());
+                    Client.SoundPlayer.Play("stapler", new SoundEffectOptions {Volume = 0.5f, Pitch = 1f});
+                    PlayerStats.Energy.Consume(item.Cost);
+                }
+                else
+                {
+                    Client.SoundPlayer.Play("blem", new SoundEffectOptions());
+                }
+            });
             index++;
         }
 
@@ -153,20 +144,19 @@ public class Cutscene
             var doneButtonPosition = wholeScreen.ToVector2() / 2 - doneButtonSize.ToVector2() / 2;
             doneButtonPosition.Y += 300;
             doneShoppingButton.Transform.LocalPosition = doneButtonPosition;
-            MakeButton(doneShoppingButton, doneButtonSize, "Done", null, () =>
-            {
-                _doneShopping = true;
-            });
-
+            MakeButton(doneShoppingButton, doneButtonSize, ()=>"Done", null, () => { _doneShopping = true; });
         }
-        
     }
 
-    public void MakeButton(Actor buttonActor, Point size, string label, string textForTooltip, Action onClick)
+    public Scene Scene { get; }
+
+    public SequenceTween Tween { get; } = new();
+
+    public void MakeButton(Actor buttonActor, Point size, Func<string> labelCallback, string textForTooltip, Action onClick)
     {
         var buyBox = new Box(buttonActor, size);
         var patch = new NinepatchRenderer(buttonActor, Client.Assets.GetAsset<NinepatchSheet>("Card-Patch"));
-        var text = new TextInBox(buttonActor, A.CardTextFont, label);
+        var text = new TextInBox(buttonActor, A.CardTextFont, labelCallback());
         new Hoverable(buttonActor);
         var hovered = false;
         new ChangeOnHovered(buttonActor,
@@ -184,6 +174,7 @@ public class Cutscene
         new Updater(buttonActor,
             dt =>
             {
+                text.Text = labelCallback();
                 if (hovered)
                 {
                     patch.Offset = new Point(0, -25);
@@ -211,10 +202,6 @@ public class Cutscene
         };
     }
 
-    public Scene Scene { get; }
-
-    public SequenceTween Tween { get; } = new();
-
     public bool IsPlaying()
     {
         return !Tween.IsDone();
@@ -222,7 +209,6 @@ public class Cutscene
 
     public void GoToShop()
     {
-        
         Tween.Add(
             new MultiplexTween()
                 .AddChannel(new Tween<float>(_musicVolume, 0f, 0.5f, Ease.Linear))
@@ -273,13 +259,6 @@ public class Cutscene
                 LudumCartridge.Ui.DiscardPile.Add(template);
             }));
             Tween.Add(new WaitSecondsTween(0.1f));
-        }
-
-        for (var i = 0; i < 1; i++)
-        {
-            Tween.Add(new CallbackTween(() =>
-                Fx.PutCardInDiscard(Fx.UiSpaceToGameSpace(ui.ReshuffleButtonBox.Rectangle.Center.ToVector2()),
-                    CropTemplate.GetRandomOfRarity(Rarity.Common, CropTemplate.GetByName("Collard")))));
         }
 
         Tween.Add(new WaitSecondsTween(1f));
@@ -416,6 +395,4 @@ public class Cutscene
     }
 }
 
-public readonly record struct ShopItem(string Name, string Description, Action<Vector2> OnBuy)
-{
-}
+public record struct ShopItem(string Name, string Description, int Cost, Action<ShopItem, Vector2> OnBuy);
