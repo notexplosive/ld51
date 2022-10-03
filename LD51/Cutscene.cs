@@ -194,10 +194,10 @@ public class Cutscene
     {
         Tween.Add(new Tween<float>(_faderOpacity, 1f, 1f, Ease.Linear));
 
-        EnqueueShowMessage("The Golem brings life to another.");
-        EnqueueShowMessage("Together they farm the wasteland.");
-        EnqueueShowMessage("Creating more Golems and lush greenery.");
-        EnqueueShowMessage("Perhaps there is hope for this world...");
+        EnqueueShowMessage("Somewhere in the wasteland, 100 years after the Calamity...");
+        EnqueueShowMessage("A second Golem awakens.");
+        EnqueueShowMessage("Months later... a third, then a fourth.");
+        EnqueueShowMessage("Golems fill the wasteland, restoring it to its former glory.");
         EnqueueShowMessage("The End - Thanks for playing!", -1);
     }
 }
