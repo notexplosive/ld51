@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ExplogineCore.Data;
 using ExplogineMonoGame;
 using ExplogineMonoGame.Data;
 using ExTween;
@@ -6,6 +7,7 @@ using ExTweenMonoGame;
 using MachinaLite;
 using MachinaLite.Components;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 
 namespace LD51;
 
@@ -14,6 +16,7 @@ public class Cutscene
     private readonly CutsceneDeck _deck;
     private readonly TweenableVector2 _deckPosition = new(Vector2.Zero);
     private readonly TweenableFloat _faderOpacity = new(0f);
+    private readonly TweenableFloat _musicVolume = new(0f);
     private readonly Tweenable<float> _textOpacity = new TweenableFloat(0f);
     private string _text;
 
@@ -21,6 +24,16 @@ public class Cutscene
     {
         Scene = scene;
 
+        var music = Client.SoundPlayer.Play("bgm", new SoundEffectOptions {Loop = true, Volume = 0});
+        var music2 = Client.SoundPlayer.Play("bgm2", new SoundEffectOptions {Loop = true, Volume = 0});
+        new Updater(Scene.AddActor("Music"), (dt) =>
+        {
+            var factor = 4f;
+            music.Volume = _musicVolume.Value / factor;
+            music2.Volume = (1 - _musicVolume.Value) / factor;
+        });
+        
+        
         var fader = Scene.AddActor("Fader");
         new Fader(fader, _faderOpacity);
         fader.Transform.Depth += 1000;
@@ -104,7 +117,12 @@ public class Cutscene
 
         Tween.Add(new WaitSecondsTween(1));
 
-        Tween.Add(new Tween<float>(_faderOpacity, 1f, 0.5f, Ease.Linear));
+        Tween.Add(
+            new MultiplexTween()
+                .AddChannel(new Tween<float>(_musicVolume, 0f, 0.5f, Ease.Linear))
+                .AddChannel(new Tween<float>(_faderOpacity, 1f, 0.5f, Ease.Linear))
+        );
+
         Tween.Add(new CallbackTween(() => world.Tiles.RandomizeContent()));
 
         var startPosition = new Vector2(Client.Window.RenderResolution.X / 2f, Client.Window.RenderResolution.Y + 200);
@@ -152,7 +170,12 @@ public class Cutscene
                     Tween.Add(new WaitSecondsTween(1));
                     Tween.Add(new Tween<Vector2>(_deckPosition, startPosition, 1f, Ease.CubicSlowFast));
                     Tween.Add(new WaitSecondsTween(1));
-                    Tween.Add(new Tween<float>(_faderOpacity, 0f, 0.5f, Ease.Linear));
+                    
+                    Tween.Add(
+                        new MultiplexTween()
+                            .AddChannel(new Tween<float>(_musicVolume, 1f, 0.5f, Ease.Linear))
+                            .AddChannel(new Tween<float>(_faderOpacity, 0f, 0.5f, Ease.Linear))
+                    );
 
                     Tween.Add(new WaitSecondsTween(0.15f));
 
@@ -178,15 +201,25 @@ public class Cutscene
         }
     }
 
-    public void PlayOpening()
+    public void PlayOpening(bool skip)
     {
-        _faderOpacity.Value = 1f;
+        if (!skip)
+        {
+            _faderOpacity.Value = 1f;
 
-        EnqueueShowMessage("Somewhere in the wasteland, 100 years after the Calamity...");
-        EnqueueShowMessage("A Golem awakens, it's mission carved into its mind.");
+            EnqueueShowMessage("Somewhere in the wasteland, 100 years after the Calamity...");
+            EnqueueShowMessage("A Golem awakens, it's mission carved into its mind.");
 
-        Tween.Add(new Tween<float>(_faderOpacity, 0f, 1f, Ease.Linear));
+            Tween.Add(new Tween<float>(_faderOpacity, 0f, 1f, Ease.Linear));
+        }
 
+        Tween.Add(new CallbackTween(() =>
+        {
+            var fadeInActor = Scene.AddActor("musicFadeIn");
+            new TweenOwner(fadeInActor).Tween = new SequenceTween()
+                .Add(new Tween<float>(_musicVolume, 1f, 5f, Ease.Linear));
+        }));
+        
         EnqueueShowMessage("\"Restore this forgotten wasteland\"");
     }
 
@@ -198,6 +231,6 @@ public class Cutscene
         EnqueueShowMessage("A second Golem awakens.");
         EnqueueShowMessage("Months later... a third, then a fourth.");
         EnqueueShowMessage("Golems fill the wasteland, restoring it to its former glory.");
-        EnqueueShowMessage("The End - Thanks for playing!", -1);
+        EnqueueShowMessage("The End - Thanks for playing!\nMade in 72 hours by NotExplosive\nMusic by Crashtroid", -1);
     }
 }

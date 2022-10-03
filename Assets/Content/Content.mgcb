@@ -13,6 +13,18 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin bgm.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:bgm.ogg
+
+#begin bgm2.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:bgm2.ogg
+
 #begin blem.ogg
 /importer:OggImporter
 /processor:SoundEffectProcessor

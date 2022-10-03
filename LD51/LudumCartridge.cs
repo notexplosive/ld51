@@ -211,9 +211,11 @@ public class LudumCartridge : MachinaCartridge
 
         ui.Inventory.DrawNextCard(true);
 
+        var skip = true;
 #if !DEBUG
-        Cutscene.PlayOpening();
+        skip = false;
 #endif
+        Cutscene.PlayOpening(skip);
     }
 
     public override void BeforeUpdate(float dt)
