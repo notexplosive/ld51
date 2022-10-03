@@ -62,11 +62,15 @@ public class Cutscene
 
         ShopItem[] shopItems =
         {
-            new("Buy Collard", CropTemplate.GetByName("Collard").Description, 50,
+            new("Buy Collard", CropTemplate.GetByName("Collard").Description, 30,
                 (item, pos) => Fx.PutCardInDiscard(pos, CropTemplate.GetByName("Collard"))),
 
-            new("Buy Beet", CropTemplate.GetByName("Beet").Description, 100,
-                (item, pos) => Fx.PutCardInDiscard(pos, CropTemplate.GetByName("Beet"))),
+            new("Buy Beet", CropTemplate.GetByName("Beet").Description, 75,
+                (item, pos) =>
+                {
+                    Fx.PutCardInDiscard(pos, CropTemplate.GetByName("Beet"));
+                    item.Cost += 25;
+                }),
 
             new("Buy KohlRabi", CropTemplate.GetByName("Kohlrabi").Description, 500,
                 (item, pos) =>
@@ -78,7 +82,7 @@ public class Cutscene
                     item.OnBuy = (item, pos) => { };
                 }),
 
-            new("Restore Wasteland",
+            new("Restore\nWasteland",
                 "Restores the Wasteland slightly, increasing the amount of usable soil", 100,
                 (item, pos) =>
                 {
