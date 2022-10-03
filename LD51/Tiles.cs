@@ -21,9 +21,13 @@ public class Tiles : BaseComponent
         {
             _content[tilePosition.GridPosition] = TileContent.Dead;
         }
-        
+
         _content[new Point(12, 5)] = TileContent.Dirt;
     }
+
+    public Point Dimensions { get; }
+
+    public TilePosition? HoveredTile { get; set; }
 
     public void RandomizeContent()
     {
@@ -44,10 +48,6 @@ public class Tiles : BaseComponent
 
         return TileContent.Dead;
     }
-
-    public Point Dimensions { get; }
-
-    public TilePosition? HoveredTile { get; set; }
 
     public override void OnMouseUpdate(Vector2 currentPosition, Vector2 worldDelta, Vector2 rawDelta,
         HitTestStack hitTestStack)
@@ -81,7 +81,7 @@ public class Tiles : BaseComponent
     private void OnTileHovered(TilePosition tilePosition)
     {
         HoveredTile = tilePosition;
-        
+
         var tapAction = LudumCartridge.World.GetTapAction(tilePosition, LudumCartridge.Ui.Inventory.GrabbedCard);
 
         var cropDescription = "";
@@ -92,7 +92,7 @@ public class Tiles : BaseComponent
             if (!crop.IsReadyToHarvest)
             {
                 var progress = !crop.IsReadyToHarvest ? $"\n{crop.PercentInCurrentLevel}%" : "";
-                
+
                 cropDescription =
                     $"Grows every {crop.Template.TickLength} seconds.\nLevel {crop.Level + 1} / {crop.Template.EffectiveMaxLevel + 1}{progress}";
             }
@@ -104,7 +104,7 @@ public class Tiles : BaseComponent
         {
             newline = "";
         }
-        
+
         if (tapAction is TapError && hasCrop)
         {
             var crop = LudumCartridge.World.Garden.GetCropAt(tilePosition);
@@ -115,11 +115,11 @@ public class Tiles : BaseComponent
             if (cropDescription != "")
             {
                 var crop = LudumCartridge.World.Garden.GetCropAt(tilePosition);
-                cropDescription = $"\n{crop.Template.Name}\n"+cropDescription;
+                cropDescription = $"\n{crop.Template.Name}\n" + cropDescription;
             }
+
             LudumCartridge.Ui.Tooltip.Set(tapAction.Title, $"{tapAction.Description}{newline}{cropDescription}");
         }
-
     }
 
     public void SetContentAt(TilePosition tilePosition, TileContent content)
@@ -171,7 +171,7 @@ public class Tiles : BaseComponent
         foreach (var tile in AllTilesPositions())
         {
             var content = GetContentAt(tile);
-            SetContentAt(tile,content.Drain());
+            SetContentAt(tile, content.Drain());
         }
     }
 
@@ -187,7 +187,7 @@ public class Tiles : BaseComponent
 
         return false;
     }
-    
+
     public Point? GetATileWithContent(TileContent targetContent)
     {
         foreach (var kv in _content)
@@ -212,5 +212,14 @@ public class Tiles : BaseComponent
         }
 
         return false;
+    }
+
+    public Rectangle Bounds()
+    {
+        var topLeftTile = GridPosToRectangle(new Point(0));
+        var bottomRightTile = GridPosToRectangle(Dimensions - new Point(1));
+
+        return new Rectangle(topLeftTile.Location,
+            new Point(bottomRightTile.Right, bottomRightTile.Bottom) - topLeftTile.Location);
     }
 }

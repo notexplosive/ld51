@@ -36,13 +36,13 @@ public class MainMenu : BaseComponent
         painter.DrawStringWithinRectangle(A.TitleScreenFont, "Harvest Golem",
             inset, Alignment.TopCenter, textDrawSettings);
         
-        painter.DrawStringWithinRectangle(A.CardTextFont, "by NotExplosive",
+        painter.DrawStringWithinRectangle(A.CardTextFont, "by NotExplosive\nmusic by Crashtroid",
             insetMore, Alignment.TopCenter, textDrawSettings);
         
         painter.DrawStringWithinRectangle(A.TooltipTitleFont, "Press F4 to toggle Fullscreen\nClick anywhere to begin",
             inset, Alignment.Center, textDrawSettings);
         
-        painter.DrawStringWithinRectangle(A.TooltipTitleFont, "notexplosive.net",
+        painter.DrawStringWithinRectangle(A.TooltipTitleFont, "notexplosive.net -- crashtroid.carrd.co",
             inset, Alignment.BottomCenter, textDrawSettings);
     }
 

@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using ExplogineMonoGame;
 using ExplogineMonoGame.Data;
-using ExTween;
 using MachinaLite;
 using Microsoft.Xna.Framework;
 
@@ -17,7 +16,7 @@ public class World
 
         var gardenActor = scene.AddActor("Tiles");
         gardenActor.Transform.Depth += 500;
-        Tiles = new Tiles(gardenActor, new Point(25));
+        Tiles = new Tiles(gardenActor, new Point(25,15));
         new TileRenderer(gardenActor);
         Garden = new Garden(gardenActor);
         new GardenRenderer(gardenActor);
@@ -44,24 +43,26 @@ public class World
 
         guy.Transform.Position =
             new Vector2(Client.Window.RenderResolution.X / 2f, Client.Window.RenderResolution.Y / 2f);
+
+        // new CameraPanner(scene.AddActor("CameraPanner"));
     }
 
+    public Tiles Tiles { get; }
+    public Garden Garden { get; }
+    public Scene Scene { get; }
 
     public bool FarmerIsBusy()
     {
         return _farmer.IsAnimating;
     }
-    
-    public Tiles Tiles { get; }
-    public Garden Garden { get; }
-    public Scene Scene { get; }
 
     public ITapAction GetTapAction(TilePosition position, Card heldCard)
     {
         if (Garden.HasCropAt(position) && Garden.GetCropAt(position).IsReadyToHarvest)
         {
             return new TapAction($"Harvest {Garden.GetCropAt(position).Template.Name}",
-                $"{Garden.GetCropAt(position).Template.CropBehaviors.Harvested.Description()}", position, Color.LightGreen,
+                $"{Garden.GetCropAt(position).Template.CropBehaviors.Harvested.Description()}", position,
+                Color.LightGreen,
                 () =>
                 {
                     var crop = Garden.GetCropAt(position);
@@ -77,8 +78,8 @@ public class World
             if (Tiles.GetContentAt(position).IsWet && Garden.IsEmpty(position))
             {
                 var description = heldCard.CropTemplate.CropBehaviors.Planted.Description();
-                var newline = description == "" ?  "" : "\n";
-                
+                var newline = description == "" ? "" : "\n";
+
                 return new TapAction($"Plant {heldCard.CropTemplate.Name}",
                     $"Plants crop in {content.Name}{newline}{description}",
                     position, Color.White, () =>
@@ -131,14 +132,17 @@ public class World
         {
             return false;
         }
-        
+
         var outOfCards = ui.Deck.IsEmpty() && ui.Inventory.Count == 0;
         var noCrops = !world.Garden.HasAnyCrop();
         var cannotPlayAnyCards = ui.Inventory.Count == 0 || !world.Tiles.HasAnyWateredTiles();
         var cannotDraw = !PlayerStats.Energy.CanAfford(A.DrawCardCost) || ui.Deck.IsEmpty();
-        var noPendingCrops = world.Garden.AllWateredCrops().ToList().Count == 0 && world.Garden.AllReadyCrops().ToList().Count == 0;
-        var cannotWaterAnyTiles = !world.Tiles.HasAnyContent(TileContent.Tilled) || !PlayerStats.Energy.CanAfford(A.WaterCost);
-        var cannotTillAnyTiles = !world.Tiles.HasAnyContent(TileContent.Dirt) || !PlayerStats.Energy.CanAfford(A.TillCost);
+        var noPendingCrops = world.Garden.AllWateredCrops().ToList().Count == 0 &&
+                             world.Garden.AllReadyCrops().ToList().Count == 0;
+        var cannotWaterAnyTiles =
+            !world.Tiles.HasAnyContent(TileContent.Tilled) || !PlayerStats.Energy.CanAfford(A.WaterCost);
+        var cannotTillAnyTiles =
+            !world.Tiles.HasAnyContent(TileContent.Dirt) || !PlayerStats.Energy.CanAfford(A.TillCost);
 
         if (outOfCards && noCrops)
         {
