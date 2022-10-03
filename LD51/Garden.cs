@@ -17,8 +17,9 @@ public class Garden : BaseComponent
     public void PlantCrop(CropEventData data)
     {
         var crop = data.Template.CreateCrop(data);
-        crop.AnimateBob();
         _map[data.Position.GridPosition] = crop;
+        crop.Plant();
+        crop.AnimateBob();
         Client.SoundPlayer.Play("plant-sfx", new SoundEffectOptions());
     }
 

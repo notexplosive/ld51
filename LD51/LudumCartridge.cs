@@ -18,7 +18,7 @@ public class LudumCartridge : MachinaCartridge
     private static Scene GameScene { get; set; }
     private static Scene UiScene { get; set; }
 
-    public override CartridgeConfig CartridgeConfig { get; } = new(new Point(1600, 900));
+    public override CartridgeConfig CartridgeConfig { get; } = new(new Point(1920, 1080));
 
     public static Ui Ui { get; private set; }
 
@@ -124,7 +124,9 @@ public class LudumCartridge : MachinaCartridge
         var tutorial = ui.Tutorial;
 
         var world = LudumCartridge.World;
-        tutorial.TellPlayerToClickOn(world.Tiles.GetRectangleAt(new Point(12, 5)),
+        world.Tiles.SetContentAt(new Point(14, 5), TileContent.Dirt);
+        
+        tutorial.TellPlayerToClickOn(world.Tiles.GetRectangleAt(new Point(14, 5)),
             "Click On Dirt to Till");
         tutorial.AddTrigger(
             () => world.Tiles.HasAnyContent(TileContent.Tilled),
@@ -162,8 +164,8 @@ public class LudumCartridge : MachinaCartridge
             () =>
             {
                 tutorial.Clear();
-                world.Tiles.SetContentAt(new Point(11, 5), TileContent.Dirt);
                 world.Tiles.SetContentAt(new Point(13, 5), TileContent.Dirt);
+                world.Tiles.SetContentAt(new Point(15, 5), TileContent.Dirt);
             });
 
         tutorial.AddTrigger(
@@ -254,6 +256,29 @@ public class DebugComponent : BaseComponent
             if (key == Keys.W)
             {
                 LudumCartridge.Ui.Inventory.AddCard(CropTemplate.GetByName("Pumpkin"));
+            }
+
+            if (key == Keys.E)
+            {
+                foreach (var template in CropTemplate.AllTemplates)
+                {
+                    LudumCartridge.Ui.Deck.AddCard(template);
+                }
+            }
+            
+            if (key == Keys.R)
+            {
+                PlayerStats.Energy.Gain(500);
+            }
+            
+            if (key == Keys.T)
+            {
+                Client.Debug.Log(CropTemplate.GetRandomOfRarity(Rarity.Rare).Name);
+            }
+            
+            if (key == Keys.Y)
+            {
+                Client.Debug.Log(CropTemplate.GetRandomOfRarity(Rarity.Common).Name);
             }
         }
     }

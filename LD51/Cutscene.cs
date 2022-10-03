@@ -65,7 +65,7 @@ public class Cutscene
             new("Buy Collard", CropTemplate.GetByName("Collard").Description, 30,
                 (item, pos) => Fx.PutCardInDiscard(pos, CropTemplate.GetByName("Collard"))),
 
-            new("Buy Beet", CropTemplate.GetByName("Beet").Description, 75,
+            new("Buy Beet", CropTemplate.GetByName("Beet").Description, 50,
                 (item, pos) =>
                 {
                     Fx.PutCardInDiscard(pos, CropTemplate.GetByName("Beet"));
@@ -87,7 +87,7 @@ public class Cutscene
                 (item, pos) =>
                 {
                     LudumCartridge.World.Tiles.UsableSoilPercent += 0.1f;
-                    item.Cost *= 2;
+                    item.Cost += 100;
 
                     if (LudumCartridge.World.Tiles.UsableSoilPercent > 1f)
                     {
@@ -120,7 +120,17 @@ public class Cutscene
         {
             var buyButton = buttons.Transform.AddActorAsChild("Buy Button");
             buyButton.Transform.LocalPosition = new Vector2(index * A.CardSize.X + paddingBetweenItems * index, 0);
-            MakeButton(buyButton, A.CardSize, ()=>$"{item.Name}\n\n{item.Cost} Energy", item.Description, () =>
+            MakeButton(buyButton, A.CardSize, () =>
+            {
+                var costString = $"{item.Cost} Energy";
+
+                if (item.Cost < 0)
+                {
+                    costString = "";
+                }
+                
+                return $"{item.Name}\n\n{costString}";
+            }, item.Description, () =>
             {
                 if (item.Cost < 0)
                 {
@@ -130,9 +140,9 @@ public class Cutscene
                 
                 if (PlayerStats.Energy.CanAfford(item.Cost))
                 {
+                    PlayerStats.Energy.Consume(item.Cost);
                     item.OnBuy(item, buyButton.GetComponent<Box>()!.Rectangle.Center.ToVector2());
                     Client.SoundPlayer.Play("stapler", new SoundEffectOptions {Volume = 0.5f, Pitch = 1f});
-                    PlayerStats.Energy.Consume(item.Cost);
                 }
                 else
                 {
@@ -391,12 +401,19 @@ public class Cutscene
     {
         Tween.Add(new Tween<float>(_faderOpacity, 1f, 1f, Ease.Linear));
 
-        EnqueueShowMessage("Somewhere in the wasteland, 100 years after the Calamity...");
+        EnqueueShowMessage("Somewhere in the wasteland, over 100 years after the Calamity...");
         EnqueueShowMessage("A second Golem awakens.");
-        EnqueueShowMessage("Months later... a third, then a fourth.");
-        EnqueueShowMessage("Golems fill the wasteland, restoring it to its former glory.");
+        EnqueueShowMessage("Soon there will be an army.");
+        EnqueueShowMessage("Finally, after over 100 years...", 3f);
+        EnqueueShowMessage("My plan has come to fruition.");
         EnqueueShowMessage("The End - Thanks for playing!\nMade in 72 hours by NotExplosive\nMusic by Crashtroid", -1);
     }
 }
 
-public record struct ShopItem(string Name, string Description, int Cost, Action<ShopItem, Vector2> OnBuy);
+public record ShopItem(string Name, string Description, int Cost, Action<ShopItem, Vector2> OnBuy)
+{
+    public string Name { get; set; } = Name;
+    public string Description { get; set; } = Description;
+    public int Cost { get; set; } = Cost;
+    public Action<ShopItem, Vector2> OnBuy { get; set; } = OnBuy;
+}

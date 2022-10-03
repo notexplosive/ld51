@@ -9,14 +9,16 @@ public class CropBehaviors
     public CropActivityCollection FinishedGrow { get; } = new("When finished growing");
     public CropActivityCollection Planted { get; } = new("When planted");
     public CropActivityCollection PlantedAdjacent { get; } = new("When a neighboring crop is planted");
+    public CropActivityCollection HarvestAdjacent { get; } = new("When a neighboring crop is harvested");
 
     public IEnumerable<CropActivityCollection> AllActivities()
     {
         yield return Planted;
         yield return Grow;
         yield return FinishedGrow;
-        yield return Harvested;
         yield return PlantedAdjacent;
+        yield return HarvestAdjacent;
+        yield return Harvested;
     }
 
     public CropBehaviors WhenHarvested(CropActivity activity)
@@ -46,6 +48,12 @@ public class CropBehaviors
     public CropBehaviors WhenPlantedAdjacent(CropActivity activity)
     {
         PlantedAdjacent.Add(activity);
+        return this;
+    }
+
+    public CropBehaviors WhenHarvestedAdjacent(CropActivity activity)
+    {
+        HarvestAdjacent.Add(activity);
         return this;
     }
 }

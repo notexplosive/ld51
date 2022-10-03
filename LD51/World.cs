@@ -16,7 +16,7 @@ public class World
 
         var gardenActor = scene.AddActor("Tiles");
         gardenActor.Transform.Depth += 500;
-        Tiles = new Tiles(gardenActor, new Point(25,15));
+        Tiles = new Tiles(gardenActor, new Point(30,15));
         new TileRenderer(gardenActor);
         Garden = new Garden(gardenActor);
         new GardenRenderer(gardenActor);

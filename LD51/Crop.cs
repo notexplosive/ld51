@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ExplogineCore.Data;
 using ExplogineMonoGame;
 using ExplogineMonoGame.AssetManagement;
@@ -124,8 +125,13 @@ public class Crop
             _garden.RemoveCropAt(_position);
             Client.SoundPlayer.Play("brush", new SoundEffectOptions());
         }
-        
+
         Template.CropBehaviors.Harvested.Run(_data, _data);
+        
+        foreach (var other in GetAdjacentCrops())
+        {
+            other.Template.CropBehaviors.HarvestAdjacent.Run(other._data,_data);
+        }
     }
 
     public string ReportProgress()
@@ -137,17 +143,28 @@ public class Crop
     {
         Template.CropBehaviors.Planted.Run(_data, _data);
 
-        for (int x = -1; x <= 1; x++)
+        foreach (var other in GetAdjacentCrops())
         {
-            for (int y = -1; y <= 1; y++)
+            other.Template.CropBehaviors.PlantedAdjacent.Run(other._data,_data);
+        }
+    }
+
+    public IEnumerable<Crop> GetAdjacentCrops()
+    {
+        for (var x = -1; x <= 1; x++)
+        {
+            for (var y = -1; y <= 1; y++)
             {
                 if (x == 0 && y == 0)
                 {
                     continue;
                 }
-                
-                var other = _data.Garden.TryGetCropAt(_data.Position.GridPosition + new Point(x,y));
-                other?.Template.CropBehaviors.PlantedAdjacent.Run(other._data,_data);
+
+                var other = _data.Garden.TryGetCropAt(_data.Position.GridPosition + new Point(x, y));
+                if (other != null)
+                {
+                    yield return other;
+                }
             }
         }
     }

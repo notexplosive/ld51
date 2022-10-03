@@ -37,6 +37,12 @@
 /processorParam:Quality=Best
 /build:brush.ogg
 
+#begin bury.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:bury.ogg
+
 #begin card.png
 /importer:TextureImporter
 /processor:TextureProcessor

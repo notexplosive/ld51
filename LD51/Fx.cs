@@ -16,7 +16,9 @@ public static class Fx
     public static void GainEnergy(Vector2 worldPosition, int amount)
     {
         Fx.GainEnergyToast(worldPosition, amount);
-        for (var i = 0; i < amount; i++)
+        PlayerStats.Energy.Amount += amount;
+
+        for (var i = 0; i < amount; i+= 5)
         {
             Fx.GainEnergyParticle(worldPosition);
         }
@@ -70,7 +72,6 @@ public static class Fx
                         )
                 )
                 .Add(new CallbackTween(particle.Destroy))
-                .Add(new CallbackTween(() => PlayerStats.Energy.Amount += 1))
             ;
     }
 

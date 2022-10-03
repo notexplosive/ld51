@@ -21,8 +21,6 @@ public class Tiles : BaseComponent
         {
             _content[tilePosition.GridPosition] = TileContent.Dead;
         }
-
-        _content[new Point(12, 5)] = TileContent.Dirt;
     }
 
     public Point Dimensions { get; }
@@ -140,11 +138,16 @@ public class Tiles : BaseComponent
             for (var x = 0; x < Dimensions.X; x++)
             {
                 var xy = new Point(x, y);
-                yield return new TilePosition(
-                    xy,
-                    GridPosToRectangle(xy));
+                yield return GridPosToTilePosition(xy);
             }
         }
+    }
+
+    public TilePosition GridPosToTilePosition(Point xy)
+    {
+        return new TilePosition(
+            xy,
+            GridPosToRectangle(xy));
     }
 
     private Rectangle GridPosToRectangle(Point xy)
