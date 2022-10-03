@@ -35,7 +35,6 @@ public class Crop
     public int Level => CurrentFrameOffset;
 
     public bool IsReadyToHarvest => CurrentFrameOffset == Template.EffectiveMaxLevel;
-    public int PercentInCurrentLevel => (int)(_timeAtCurrentLevel / Template.GrowCondition.TickLength * 100);
 
     public void Draw(Painter painter, Vector2 renderPos, Depth depth)
     {
@@ -58,7 +57,7 @@ public class Crop
             _timeAtCurrentLevel += dt;
         }
 
-        if (_timeAtCurrentLevel > Template.GrowCondition.TickLength && Template.GrowCondition.CanGrow(_data))
+        if (Template.GrowCondition.CanGrow(_data, _timeAtCurrentLevel))
         {
             Grow();
         }
@@ -80,8 +79,6 @@ public class Crop
             _tiles.SetContentAt(_position, _tiles.GetContentAt(_position).Drain());
             CurrentFrameOffset++;
 
-            
-            
             Grew?.Invoke(_data);
 
             if (IsReadyToHarvest)
@@ -134,6 +131,11 @@ public class Crop
         
 
         Harvested?.Invoke(_data);
+    }
+
+    public string ReportProgress()
+    {
+        return !IsReadyToHarvest ? Template.GrowCondition.Progress(_timeAtCurrentLevel) : "";
     }
 }
 

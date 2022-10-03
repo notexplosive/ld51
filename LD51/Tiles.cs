@@ -91,7 +91,7 @@ public class Tiles : BaseComponent
             var crop = LudumCartridge.World.Garden.GetCropAt(tilePosition);
             if (!crop.IsReadyToHarvest)
             {
-                var progress = !crop.IsReadyToHarvest ? $"\n{crop.PercentInCurrentLevel}%" : "";
+                var progress = crop.ReportProgress();
 
                 cropDescription =
                     $"{crop.Template.GrowCondition.Description()}\nLevel {crop.Level + 1} / {crop.Template.EffectiveMaxLevel + 1}{progress}";

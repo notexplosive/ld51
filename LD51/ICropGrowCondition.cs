@@ -2,7 +2,7 @@
 
 public interface ICropGrowCondition
 {
-    public int TickLength { get; }
-    bool CanGrow(CropEventData data);
+    bool CanGrow(CropEventData data, float time);
     string Description();
+    string Progress(float time);
 }

@@ -82,7 +82,7 @@ public record CropTemplate(string Name, ICropGrowCondition GrowCondition, Rarity
         
         yield return new CropTemplate(
             "Collard",
-            new NormalGrowCondition(3),
+            new GrowOverTime(3),
             Rarity.Common,
             new CropGraphic(2, 14),
             new CropBehaviors()
@@ -92,7 +92,7 @@ public record CropTemplate(string Name, ICropGrowCondition GrowCondition, Rarity
         
         yield return new CropTemplate(
             "Spinach",
-            new NormalGrowCondition(3),
+            new GrowOverTime(3),
             Rarity.Rare,
             new CropGraphic(2, 17),
             new CropBehaviors()
@@ -103,7 +103,7 @@ public record CropTemplate(string Name, ICropGrowCondition GrowCondition, Rarity
 
         yield return new CropTemplate(
             "Parsnip",
-            new NormalGrowCondition(5),
+            new GrowOverTime(5),
             Rarity.Rare,
             new CropGraphic(2, 20),
             new CropBehaviors()
@@ -115,7 +115,7 @@ public record CropTemplate(string Name, ICropGrowCondition GrowCondition, Rarity
 
         yield return new CropTemplate(
             "Carrot",
-            new NormalGrowCondition(10),
+            new GrowOverTime(10),
             Rarity.Common,
             new CropGraphic(1, 3),
             new CropBehaviors()
@@ -126,7 +126,7 @@ public record CropTemplate(string Name, ICropGrowCondition GrowCondition, Rarity
         
         yield return new CropTemplate(
             "Beet",
-            new NormalGrowCondition(10),
+            new GrowOverTime(10),
             Rarity.Common,
             new CropGraphic(1, 23),
             new CropBehaviors()
@@ -148,7 +148,7 @@ public record CropTemplate(string Name, ICropGrowCondition GrowCondition, Rarity
         
         yield return new CropTemplate(
             "Kohlrabi",
-            new NormalGrowCondition(10),
+            new GrowOverTime(10),
             Rarity.Rare,
             new CropGraphic(1, 25),
             new CropBehaviors()
@@ -159,7 +159,7 @@ public record CropTemplate(string Name, ICropGrowCondition GrowCondition, Rarity
 
         yield return new CropTemplate(
             "Watermelon",
-            new NormalGrowCondition(1),
+            new GrowOverTime(1),
             Rarity.Rare,
             new CropGraphic(3, 10),
             new CropBehaviors()
@@ -191,7 +191,7 @@ public record CropTemplate(string Name, ICropGrowCondition GrowCondition, Rarity
         
         yield return new CropTemplate(
             "Onion",
-            new NormalGrowCondition(2),
+            new GrowOverTime(2),
             Rarity.Common,
             new CropGraphic(2, 31),
             new CropBehaviors()
@@ -214,7 +214,7 @@ public record CropTemplate(string Name, ICropGrowCondition GrowCondition, Rarity
         
         yield return new CropTemplate(
             "Pumpkin",
-            new SurroundedByCrops(10),
+            new GrowOverTime(10), // todo
             Rarity.Legendary,
             new CropGraphic(3, 34),
             new CropBehaviors()
