@@ -1,6 +1,8 @@
 # How to run and build locally
 
-- Install .NET 6 SDK: https://dotnet.microsoft.com/en-us/download/dotnet/6.0
+- Make sure you have .NET 6 SDK or above
+  - `dotnet --version` should show `6.x.yyy`
+  - if not, go get it: https://dotnet.microsoft.com/en-us/download/dotnet/6.0
 - Clone the repo
 - `cd` into the root of the repo
 - Run release build `dotnet run --project ./LD51 -c Release`
