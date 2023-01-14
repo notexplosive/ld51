@@ -32,7 +32,7 @@ public class SpriteRenderer : BaseComponent
 
     public override void Draw(Painter painter)
     {
-        _spriteSheet.DrawFrame(painter, CurrentFrame, Transform.Position, new Scale2D(Scale),
+        _spriteSheet.DrawFrameAtPosition(painter, CurrentFrame, Transform.Position, new Scale2D(Scale),
             new DrawSettings
                 {Color = Color, Flip = Flip, Angle = Transform.Angle, Depth = Transform.Depth, Origin = Origin});
     }

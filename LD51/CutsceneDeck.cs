@@ -13,12 +13,14 @@ namespace LD51;
 public class CutsceneDeck : BaseComponent
 {
     private readonly TweenableVector2 _deckPosition = new();
+    private readonly IRuntime _runtime;
     private readonly Dictionary<int, ChildCard> _children = new();
     private float _totalTime;
 
-    public CutsceneDeck(Actor actor, TweenableVector2 deckPosition) : base(actor)
+    public CutsceneDeck(Actor actor, TweenableVector2 deckPosition, IRuntime runtime) : base(actor)
     {
         _deckPosition = deckPosition;
+        _runtime = runtime;
     }
 
     public int NumberOfCards { get; set; }
@@ -91,7 +93,7 @@ public class CutsceneDeck : BaseComponent
             () =>
             {
                 Client.SoundPlayer.Play("draw-card", new SoundEffectOptions());
-                _children.Add(index, new ChildCard((float) index / NumberOfCards * MathF.PI * 2));
+                _children.Add(index, new ChildCard(_runtime, (float) index / NumberOfCards * MathF.PI * 2));
             });
     }
 
@@ -104,12 +106,12 @@ public class CutsceneDeck : BaseComponent
         });
     }
 
-    public record ChildCard(float Angle)
+    public record ChildCard(IRuntime Runtime, float Angle)
     {
         public bool IsPulling;
         public float Time;
 
-        public float Radius => Ease.CubicFastSlow(Time) * Client.Window.RenderResolution.Y / 3f;
+        public float Radius => Ease.CubicFastSlow(Time) * Runtime.Window.RenderResolution.Y / 3f;
 
         public void Pull()
         {

@@ -9,12 +9,14 @@ namespace LD51;
 
 public class Ui
 {
+    private readonly IRuntime _runtime;
     public readonly Tooltip Tooltip;
 
-    public Ui(Scene scene)
+    public Ui(Scene scene, IRuntime runtime)
     {
+        _runtime = runtime;
         Scene = scene;
-        var totalScreenSize = Client.Window.RenderResolution;
+        var totalScreenSize = _runtime.Window.RenderResolution;
         var sheet = Client.Assets.GetAsset<NinepatchSheet>("UI-Patch");
 
         // Tutorial
@@ -116,7 +118,7 @@ public class Ui
         var errorToast = scene.AddActor("Error");
         errorToast.Transform.Depth = 120;
         errorToast.Transform.Position = new Vector2(0, totalScreenSize.Y / 2 - A.BigFont.FontSize / 2);
-        ErrorToast = new ErrorToast(errorToast);
+        ErrorToast = new ErrorToast(errorToast, _runtime);
         
         // Card Trail
         var cardTrail = scene.AddActor("CardTrail");

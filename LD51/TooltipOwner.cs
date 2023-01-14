@@ -1,5 +1,4 @@
 ﻿using ExplogineMonoGame;
-using ExplogineMonoGame.HitTesting;
 using MachinaLite;
 using MachinaLite.Components;
 using Microsoft.Xna.Framework;

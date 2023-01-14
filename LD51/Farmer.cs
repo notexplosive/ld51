@@ -42,7 +42,7 @@ public class Farmer : BaseComponent
         if (_currentShownTool != Tool.None)
         {
             var frameIndex = (int) _currentShownTool - 1;
-            Client.Assets.GetAsset<SpriteSheet>("Tools").DrawFrame(painter, frameIndex,
+            Client.Assets.GetAsset<SpriteSheet>("Tools").DrawFrameAtPosition(painter, frameIndex,
                 Transform.Position + new Vector2(0, -20), Scale2D.One,
                 new DrawSettings
                     {Color = Color.White, Angle = _toolAngle, Origin = new DrawOrigin(new Vector2(13, 50))});

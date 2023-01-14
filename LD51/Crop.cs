@@ -39,7 +39,7 @@ public class Crop
 
     public void Draw(Painter painter, Vector2 renderPos, Depth depth)
     {
-        Client.Assets.GetAsset<SpriteSheet>("Plants").DrawFrame(painter,
+        Client.Assets.GetAsset<SpriteSheet>("Plants").DrawFrameAtPosition(painter,
             Template.CropGraphic.FirstFrame + CurrentFrameOffset,
             renderPos, new Scale2D(_scale),
             new DrawSettings

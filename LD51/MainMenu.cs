@@ -2,7 +2,6 @@
 using ExplogineMonoGame;
 using ExplogineMonoGame.AssetManagement;
 using ExplogineMonoGame.Data;
-using ExplogineMonoGame.HitTesting;
 using ExplogineMonoGame.Input;
 using MachinaLite;
 using Microsoft.Xna.Framework;
@@ -13,15 +12,17 @@ namespace LD51;
 public class MainMenu : BaseComponent
 {
     private readonly Action _startGame;
+    private readonly IRuntime _runtime;
 
-    public MainMenu(Actor actor, Action startGame) : base(actor)
+    public MainMenu(Actor actor, Action startGame, IRuntime runtime) : base(actor)
     {
         _startGame = startGame;
+        _runtime = runtime;
     }
 
     public override void Draw(Painter painter)
     {
-        var wholeScreen = new Rectangle(Point.Zero, Client.Window.RenderResolution);
+        var wholeScreen = new Rectangle(Point.Zero, _runtime.Window.RenderResolution);
         var inset = wholeScreen;
         inset.Inflate(0, -100);
 

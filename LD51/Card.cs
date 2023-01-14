@@ -1,5 +1,5 @@
 ﻿using System;
-using ExplogineMonoGame.HitTesting;
+using ExplogineMonoGame.Data;
 using ExplogineMonoGame.Input;
 using ExTween;
 using MachinaLite;

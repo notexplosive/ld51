@@ -9,12 +9,14 @@ namespace LD51;
 
 public class ErrorToast : BaseComponent
 {
+    private readonly IRuntime _runtime;
     private readonly TweenableFloat _opacity = new(0f);
     private string _text;
     private readonly SequenceTween _tween = new();
 
-    public ErrorToast(Actor actor) : base(actor)
+    public ErrorToast(Actor actor, IRuntime runtime) : base(actor)
     {
+        _runtime = runtime;
     }
 
     public void ShowError(string errorText)
@@ -36,7 +38,7 @@ public class ErrorToast : BaseComponent
     public override void Draw(Painter painter)
     {
         var rect = new Rectangle(Transform.Position.ToPoint(),
-            new Point(Client.Window.RenderResolution.X, A.BigFont.FontSize));
+            new Point(_runtime.Window.RenderResolution.X, A.BigFont.FontSize));
 
         var bgRect = rect;
         bgRect.Inflate(0, 10);

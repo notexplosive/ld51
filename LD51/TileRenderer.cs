@@ -20,7 +20,7 @@ public class TileRenderer : BaseComponent
         foreach(var position in _tiles.AllTilesPositions())
         {
             {
-                A.TileSheet.DrawFrame(painter, _tiles.GetContentAt(position).Frame,
+                A.TileSheet.DrawFrameAtPosition(painter, _tiles.GetContentAt(position).Frame,
                     position.Rectangle.Location.ToVector2(),
                     Scale2D.One,
                     new DrawSettings {Color = Color.White, Depth = Transform.Depth});

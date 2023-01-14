@@ -1,5 +1,5 @@
 ﻿using ExplogineMonoGame;
-using ExplogineMonoGame.HitTesting;
+using ExplogineMonoGame.Data;
 using MachinaLite;
 using Microsoft.Xna.Framework;
 
@@ -7,8 +7,11 @@ namespace LD51;
 
 public class CameraPanner : BaseComponent
 {
-    public CameraPanner(Actor actor) : base(actor)
+    private readonly IRuntime _runtime;
+
+    public CameraPanner(Actor actor, IRuntime runtime) : base(actor)
     {
+        _runtime = runtime;
     }
 
     public override void OnMouseUpdate(Vector2 currentPosition, Vector2 worldDelta, Vector2 rawDelta,
@@ -20,7 +23,7 @@ public class CameraPanner : BaseComponent
         }
 
         var screenPosition = Actor.Scene.Camera.WorldToScreen(currentPosition);
-        if (!new Rectangle(Point.Zero, Client.Window.RenderResolution).Contains(screenPosition))
+        if (!new Rectangle(Point.Zero, _runtime.Window.RenderResolution).Contains(screenPosition))
         {
             return;
         }
@@ -28,7 +31,7 @@ public class CameraPanner : BaseComponent
         var padding = 64;
         var moveSpeed = 10;
 
-        var bottomRight = Client.Window.RenderResolution.ToVector2() - new Vector2(padding);
+        var bottomRight = _runtime.Window.RenderResolution.ToVector2() - new Vector2(padding);
 
         if (screenPosition.X < padding)
         {
@@ -51,7 +54,7 @@ public class CameraPanner : BaseComponent
         }
 
         var camPos = Actor.Scene.Camera.Position;
-        var viewSize = Client.Window.RenderResolution;
+        var viewSize = _runtime.Window.RenderResolution;
         var bounds = LudumCartridge.World.Tiles.Bounds();
         if (camPos.X < bounds.X)
         {

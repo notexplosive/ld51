@@ -35,7 +35,8 @@ public class TextToast : BaseComponent
         var amount = _amount.ToString();
         var measureString = font.MeasureString(amount);
         painter.DrawStringAtPosition(font, amount,
-            (Transform.Position - measureString / 2f).ToPoint() + new Point(0, (int) -_height.Value), new DrawSettings
+            ((Transform.Position - measureString / 2f).ToPoint() + new Point(0, (int) -_height.Value)).ToVector2(),
+            new DrawSettings
             {
                 Color = Color.Goldenrod
             });

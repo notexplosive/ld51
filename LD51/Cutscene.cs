@@ -15,6 +15,7 @@ namespace LD51;
 
 public class Cutscene
 {
+    private readonly IRuntime _runtime;
     private readonly CutsceneDeck _deck;
     private readonly TweenableVector2 _deckPosition = new(Vector2.Zero);
     private readonly TweenableFloat _faderOpacity = new(0f);
@@ -25,8 +26,9 @@ public class Cutscene
     private bool _doneShopping;
     private string _text;
 
-    public Cutscene(Scene scene)
+    public Cutscene(Scene scene, IRuntime runtime)
     {
+        _runtime = runtime;
         Scene = scene;
 
         var music = Client.SoundPlayer.Play("bgm", new SoundEffectOptions {Loop = true, Volume = 0});
@@ -39,17 +41,17 @@ public class Cutscene
         });
 
         var fader = Scene.AddActor("Fader");
-        new Fader(fader, _faderOpacity);
+        new Fader(fader, _faderOpacity, _runtime);
         fader.Transform.Depth += 1000;
 
         var deckActor = Scene.AddActor("Deck");
-        _deck = new CutsceneDeck(deckActor, _deckPosition);
+        _deck = new CutsceneDeck(deckActor, _deckPosition, _runtime);
 
-        var startPosition = new Vector2(Client.Window.RenderResolution.X / 2f, Client.Window.RenderResolution.Y + 200);
+        var startPosition = new Vector2(_runtime.Window.RenderResolution.X / 2f, _runtime.Window.RenderResolution.Y + 200);
         _deckPosition.Value = startPosition;
 
         var textActor = scene.AddActor("Text");
-        new Box(textActor, Client.Window.RenderResolution);
+        new Box(textActor, _runtime.Window.RenderResolution);
         var textInBox = new TextInBox(textActor, A.BigFont, "");
         new Updater(textActor, _ =>
         {
@@ -99,7 +101,7 @@ public class Cutscene
                 })
         };
 
-        var wholeScreen = Client.Window.RenderResolution;
+        var wholeScreen = _runtime.Window.RenderResolution;
         var tooltip = _shop.Transform.AddActorAsChild("Tooltip");
         var tooltipInset = 100;
         tooltip.Transform.Position += new Vector2(tooltipInset);
@@ -297,9 +299,9 @@ public class Cutscene
 
         Tween.Add(new CallbackTween(() => world.Tiles.RandomizeContent()));
 
-        var startPosition = new Vector2(Client.Window.RenderResolution.X / 2f, Client.Window.RenderResolution.Y + 200);
+        var startPosition = new Vector2(_runtime.Window.RenderResolution.X / 2f, _runtime.Window.RenderResolution.Y + 200);
         _deckPosition.Value = startPosition;
-        var centerOfScreen = Client.Window.RenderResolution.ToVector2() / 2;
+        var centerOfScreen = _runtime.Window.RenderResolution.ToVector2() / 2;
 
         Tween.Add(new Tween<Vector2>(_deckPosition, centerOfScreen, 1f, Ease.CubicFastSlow));
 

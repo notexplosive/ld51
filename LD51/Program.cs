@@ -11,4 +11,4 @@ var config = new WindowConfigWritable
     Fullscreen = true
 #endif
 };
-Bootstrap.Run(args, new WindowConfig(config), new LudumCartridge());
+Bootstrap.Run(args, new WindowConfig(config), runtime => new LudumCartridge(runtime), "--skipSnapShot");

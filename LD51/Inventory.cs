@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using ExplogineCore.Data;
 using ExplogineMonoGame;
-using ExplogineMonoGame.HitTesting;
+using ExplogineMonoGame.Data;
 using ExplogineMonoGame.Input;
 using MachinaLite;
 using MachinaLite.Components;

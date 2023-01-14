@@ -91,7 +91,7 @@ public class Tutorial : BaseComponent
 
     private float AnimationValue()
     {
-        _currentAnimation.JumpTo(_time % _currentAnimation.TotalDuration.Get());
+        _currentAnimation.JumpTo(_time % _currentAnimation.TotalDuration.GetDuration());
         return _val;
     }
 

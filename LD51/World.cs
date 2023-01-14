@@ -8,10 +8,12 @@ namespace LD51;
 
 public class World
 {
+    private readonly IRuntime _runtime;
     private readonly Farmer _farmer;
 
-    public World(Scene scene)
+    public World(Scene scene, IRuntime runtime)
     {
+        _runtime = runtime;
         Scene = scene;
 
         var gardenActor = scene.AddActor("Tiles");
@@ -42,7 +44,7 @@ public class World
         };
 
         guy.Transform.Position =
-            new Vector2(Client.Window.RenderResolution.X / 2f, Client.Window.RenderResolution.Y / 2f);
+            new Vector2(_runtime.Window.RenderResolution.X / 2f, _runtime.Window.RenderResolution.Y / 2f);
 
         // new CameraPanner(scene.AddActor("CameraPanner"));
     }

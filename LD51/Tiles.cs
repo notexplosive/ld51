@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using ExplogineMonoGame;
-using ExplogineMonoGame.HitTesting;
+using ExplogineMonoGame.Data;
 using ExplogineMonoGame.Input;
 using MachinaLite;
 using Microsoft.Xna.Framework;
@@ -54,7 +54,7 @@ public class Tiles : BaseComponent
         HoveredTile = null;
         foreach (var tile in AllTilesPositions())
         {
-            hitTestStack.Add(tile.Rectangle, Transform.Depth, () => { OnTileHovered(tile); });
+            hitTestStack.AddZone(tile.Rectangle, Transform.Depth, () => { OnTileHovered(tile); });
         }
     }
 
