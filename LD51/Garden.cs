@@ -20,7 +20,7 @@ public class Garden : BaseComponent
         _map[data.Position.GridPosition] = crop;
         crop.Plant();
         crop.AnimateBob();
-        Client.SoundPlayer.Play("plant-sfx", new SoundEffectOptions());
+        Client.SoundPlayer.Play("plant-sfx", new SoundEffectSettings());
     }
 
     public bool IsEmpty(TilePosition tilePosition)

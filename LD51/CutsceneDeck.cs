@@ -92,7 +92,7 @@ public class CutsceneDeck : BaseComponent
         return new CallbackTween(
             () =>
             {
-                Client.SoundPlayer.Play("draw-card", new SoundEffectOptions());
+                Client.SoundPlayer.Play("draw-card", new SoundEffectSettings());
                 _children.Add(index, new ChildCard(_runtime, (float) index / NumberOfCards * MathF.PI * 2));
             });
     }
@@ -102,7 +102,7 @@ public class CutsceneDeck : BaseComponent
         return new CallbackTween(() =>
         {
             _children[index].Pull();
-            Client.SoundPlayer.Play("paper", new SoundEffectOptions());
+            Client.SoundPlayer.Play("paper", new SoundEffectSettings());
         });
     }
 

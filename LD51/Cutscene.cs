@@ -31,8 +31,8 @@ public class Cutscene
         _runtime = runtime;
         Scene = scene;
 
-        var music = Client.SoundPlayer.Play("bgm", new SoundEffectOptions {Loop = true, Volume = 0});
-        var music2 = Client.SoundPlayer.Play("bgm2", new SoundEffectOptions {Loop = true, Volume = 0});
+        var music = Client.SoundPlayer.Play("bgm", new SoundEffectSettings {Loop = true, Volume = 0});
+        var music2 = Client.SoundPlayer.Play("bgm2", new SoundEffectSettings {Loop = true, Volume = 0});
         new Updater(Scene.AddActor("Music"), dt =>
         {
             var factor = 4f;
@@ -144,11 +144,11 @@ public class Cutscene
                 {
                     PlayerStats.Energy.Consume(item.Cost);
                     item.OnBuy(item, buyButton.GetComponent<Box>()!.Rectangle.Center.ToVector2());
-                    Client.SoundPlayer.Play("stapler", new SoundEffectOptions {Volume = 0.5f, Pitch = 1f});
+                    Client.SoundPlayer.Play("stapler", new SoundEffectSettings {Volume = 0.5f, Pitch = 1f});
                 }
                 else
                 {
-                    Client.SoundPlayer.Play("blem", new SoundEffectOptions());
+                    Client.SoundPlayer.Play("blem", new SoundEffectSettings());
                 }
             });
             index++;

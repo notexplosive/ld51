@@ -85,11 +85,11 @@ public class Crop
             if (IsReadyToHarvest)
             {
                 Template.CropBehaviors.FinishedGrow.Run(_data, _data);
-                Client.SoundPlayer.Play("tag2", new SoundEffectOptions());
+                Client.SoundPlayer.Play("tag2", new SoundEffectSettings());
             }
             else
             {
-                Client.SoundPlayer.Play("tag", new SoundEffectOptions());
+                Client.SoundPlayer.Play("tag", new SoundEffectSettings());
             }
         }
     }
@@ -123,7 +123,7 @@ public class Crop
         if (!skipRemove)
         {
             _garden.RemoveCropAt(_position);
-            Client.SoundPlayer.Play("brush", new SoundEffectOptions());
+            Client.SoundPlayer.Play("brush", new SoundEffectSettings());
         }
 
         Template.CropBehaviors.Harvested.Run(_data, _data);

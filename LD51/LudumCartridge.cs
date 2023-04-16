@@ -97,12 +97,7 @@ public class LudumCartridge : MachinaCartridge
             return canvas.AsTextureAsset();
         });
     }
-
-    public override void UpdateInput(ConsumableInput input, HitTestStack hitTestStack)
-    {
-        // This entrypoint didn't exist when I made this game. maybe MachinaCartridge should take advantage of it?
-    }
-
+    
     public override void OnCartridgeStarted()
     {
 #if !DEBUG

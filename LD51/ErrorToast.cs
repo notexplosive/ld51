@@ -21,7 +21,7 @@ public class ErrorToast : BaseComponent
 
     public void ShowError(string errorText)
     {
-        Client.SoundPlayer.Play("blem", new SoundEffectOptions());
+        Client.SoundPlayer.Play("blem", new SoundEffectSettings());
         _tween.Clear();
         _opacity.Value = 0f;
         _text = errorText;

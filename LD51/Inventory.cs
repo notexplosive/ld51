@@ -82,7 +82,7 @@ public class Inventory : BaseComponent
 
         if (!IsFull() && LudumCartridge.Ui.Deck.IsNotEmpty() && canAfford)
         {
-            Client.SoundPlayer.Play("draw-card", new SoundEffectOptions());
+            Client.SoundPlayer.Play("draw-card", new SoundEffectSettings());
             if (!skipCost)
             {
                 PlayerStats.Energy.Consume(cost);
@@ -133,7 +133,7 @@ public class Inventory : BaseComponent
 
     public void Grab(Card card)
     {
-        Client.SoundPlayer.Play("paper", new SoundEffectOptions());
+        Client.SoundPlayer.Play("paper", new SoundEffectSettings());
         GrabbedCard = card;
     }
 

@@ -95,7 +95,7 @@ public static class Fx
         if (tiles.GetContentAt(gridPosition).IsTilled)
         {
             
-            Client.SoundPlayer.Play("splash", new SoundEffectOptions());
+            Client.SoundPlayer.Play("splash", new SoundEffectSettings());
 
             var water = LudumCartridge.World.Scene.AddActor("Water");
             water.Transform.Position = tiles.GetRectangleAt(gridPosition).Center.ToVector2();
@@ -140,7 +140,7 @@ public static class Fx
             var duration = 1f;
             var tweenOwner = new TweenOwner(particle);
             tweenOwner.Tween = new SequenceTween()
-                    .Add(new CallbackTween(()=>Client.SoundPlayer.Play("draw-card", new SoundEffectOptions())))
+                    .Add(new CallbackTween(()=>Client.SoundPlayer.Play("draw-card", new SoundEffectSettings())))
                     .Add(
                         new MultiplexTween()
                             .AddChannel(new Tween<Vector2>(positionTweenable,
